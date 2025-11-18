@@ -1,8 +1,8 @@
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 from app.db import get_db
-from app.models import Candidature, Paie, Absence, Discipline, Contrat
-
+from app.models.models import Candidature, Paie, Absence, Contrat
+from app.models.discipline import Discipline
 router = APIRouter()
 
 @router.get("/stats")

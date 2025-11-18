@@ -12,6 +12,8 @@ class CandidatureBase(BaseModel):
     statut: Optional[str] = "En attente"
     cv_path: Optional[str] = None
     score: Optional[float] = None
+    ref_offre: str
+
 
 class CandidatureCreate(CandidatureBase):
     pass

@@ -1,30 +1,14 @@
+# # models/models.py
+
+
 from sqlalchemy import Column, Integer, String, Float, ForeignKey, Text, JSON, Date, Boolean
 from sqlalchemy.orm import relationship
 from app.db import Base
 from datetime import date
 
-# =======================
-# MODELS
-# =======================
-
-class Offre(Base):
-    __tablename__ = "offres"
-    __table_args__ = {"extend_existing": True}
-
-    id = Column(Integer, primary_key=True, index=True)
-    titre = Column(String(255), nullable=False)
-    description = Column(Text, nullable=True)
-    competences = Column(Text, nullable=True)
-    date_cloture = Column(String(50), nullable=True)
-
-    candidatures = relationship(
-        "Candidature",
-        back_populates="offre",
-        cascade="all, delete-orphan"
-    )
-
 
 class Candidature(Base):
+    
     __tablename__ = "candidatures"
     __table_args__ = {"extend_existing": True}
 
@@ -37,7 +21,7 @@ class Candidature(Base):
     parsed_json = Column(JSON, nullable=True)
     score = Column(Float, nullable=True)
     statut = Column(String(50), default="nouveau")
-    is_selected = Column(Boolean, default=False)
+    poste = Column(String(100), nullable=True)
 
     offre_id = Column(Integer, ForeignKey("offres.id", ondelete="CASCADE"), nullable=False)
 
@@ -52,9 +36,11 @@ class Candidature(Base):
 
 class Employee(Base):
     __tablename__ = "employees"
-    __table_args__ = {"extend_existing": True}
+    __table_args__= {"extend_existing": True}
 
     id = Column(Integer, primary_key=True, index=True)
+    nom = Column(String(100), nullable=False)
+    prenom = Column(String(100), nullable=False)
     fullname = Column(String(255), nullable=False)
     email = Column(String(255), nullable=True)
     phone = Column(String(50), nullable=True)
@@ -66,17 +52,16 @@ class Employee(Base):
     contrats = relationship("Contrat", back_populates="employee")
     absences = relationship("Absence", back_populates="employee", cascade="all, delete-orphan")
 
+
 class Paie(Base):
     __tablename__ = "paies"
     __table_args__ = {"extend_existing": True}
 
     id = Column(Integer, primary_key=True, index=True)
     employee_id = Column(Integer, ForeignKey("employees.id"), nullable=False)
-    
-    # Montant total payé (net)
+
     montant = Column(Float, nullable=False)
 
-    # Champs automatique / calcul
     salaire_base = Column(Float, nullable=True)
     primes = Column(Float, default=0.0)
     heures_supp = Column(Float, default=0.0)
@@ -84,16 +69,14 @@ class Paie(Base):
     absence_deduction = Column(Float, default=0.0)
     salaire_net = Column(Float, nullable=True)
 
-    # Mois / année
     mois = Column(String(20), nullable=False)
     annee = Column(Integer, nullable=False)
 
-    # ⚠ Date de la paie
     date_paie = Column(Date, nullable=False, default=date.today)
 
     employee = relationship("Employee", back_populates="paies")
 
-# ===================== MODELS =====================
+
 class Contrat(Base):
     __tablename__ = "contrats"
     __table_args__ = {"extend_existing": True}
@@ -132,9 +115,6 @@ class Convocation(Base):
     candidature = relationship("Candidature", back_populates="convocations")
 
 
-# =======================
-# 🔹 Modèle Absence (mis à jour)
-# =======================
 class Absence(Base):
     __tablename__ = "absences"
     __table_args__ = {"extend_existing": True}
@@ -150,15 +130,11 @@ class Absence(Base):
     employee = relationship("Employee", back_populates="absences")
 
 
-# =======================
-# __all__ pour imports
-# =======================
-__all__ = [
+_all_ = [
     "Employee",
     "Paie",
     "Contrat",
     "Utilisateur",
-    "Offre",
     "Candidature",
     "Convocation",
     "Absence",

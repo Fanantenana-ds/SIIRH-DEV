@@ -2,7 +2,7 @@ from fastapi import APIRouter, HTTPException
 from sqlalchemy.orm import Session
 from fastapi import Depends
 from app.db import get_db
-from app.models.models import Offre
+from app.models.offres import Offre
 from app.services.pdf_service import generate_offre_pdf
 
 router = APIRouter()

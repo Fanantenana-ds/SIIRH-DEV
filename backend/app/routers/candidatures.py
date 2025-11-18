@@ -30,13 +30,13 @@ def create_candidature(
     type_contrat: str = Form(None),
     mobilite: str = Form(None),
     autorisation: str = Form(None),
-    offre_reference: str = Form(...),  # référence de l'offre (titre na code)
     competences_techniques: str = Form(None),
     competences_comportementales: str = Form(None),
     langues: str = Form(None),
     cv: UploadFile = File(...),
     lettre: UploadFile = File(None),
     diplomes: UploadFile = File(None),
+    ref_offre: str = Form(...),  # ✔ VERSION CORRECTE
     db: Session = Depends(get_db)
 ):
     """
@@ -59,7 +59,7 @@ def create_candidature(
     diplomes_path = save_file(diplomes)
 
     # --- Vérification existence offre ---
-    offre = db.query(Offre).filter(Offre.titre == offre_reference).first()
+    offre = db.query(Offre).filter(Offre.titre == ref_offre).first()
     if not offre:
         raise HTTPException(status_code=404, detail="Offre non trouvée")
 
@@ -93,7 +93,7 @@ def create_candidature(
         raw_cv_s3=cv_path,
         score=score_global,
         statut="En attente",
-        offre_id=offre.id,
+        ref_offre=ref_offre,          # ✔ NOT NULL: inserted correctly
     )
 
     db.add(new_candidature)

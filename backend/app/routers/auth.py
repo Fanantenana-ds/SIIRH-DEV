@@ -140,7 +140,7 @@ from jose import jwt
 from datetime import datetime, timedelta
 from pydantic import BaseModel, EmailStr
 from app.db import get_db
-from app.models import Utilisateur
+from app.models.models import Utilisateur
 import random, string
 
 router = APIRouter(tags=["Authentification"])

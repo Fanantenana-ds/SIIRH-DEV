@@ -1,0 +1,85 @@
+/* src/pages/DisciplineForm.css */
+.discipline-container {
+    max-width: 900px;
+    margin: 2rem auto;
+    padding: 2rem;
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.discipline-container h2 {
+    text-align: center;
+    margin-bottom: 1.5rem;
+}
+
+.discipline-form label {
+    display: block;
+    margin-bottom: 1rem;
+    font-weight: 500;
+}
+
+.discipline-form select,
+.discipline-form input[type="file"],
+.discipline-form textarea {
+    width: 100%;
+    padding: 0.6rem;
+    margin-top: 0.3rem;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+.discipline-form textarea {
+    min-height: 120px;
+    resize: vertical;
+}
+
+.btn-submit {
+    display: block;
+    margin: 1.5rem auto 0;
+    padding: 0.75rem 2rem;
+    background-color: #3b82f6;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 600;
+}
+
+.btn-submit:hover {
+    background-color: #2563eb;
+}
+
+.history-section {
+    margin-top: 2rem;
+}
+
+.history-section table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.history-section th,
+.history-section td {
+    padding: 0.8rem;
+    border: 1px solid #ddd;
+    text-align: left;
+}
+
+@media (max-width: 768px) {
+    .discipline-container {
+        padding: 1rem;
+    }
+
+    .discipline-form label {
+        font-size: 0.9rem;
+    }
+
+    .btn-submit {
+        width: 100%;
+    }
+
+    .history-section table {
+        font-size: 0.85rem;
+    }
+}

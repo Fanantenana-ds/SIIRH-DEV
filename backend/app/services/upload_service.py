@@ -1,9 +1,12 @@
+# app/services/upload_service.py
+
 import os
 from datetime import datetime
 from fastapi import UploadFile
 from sqlalchemy.orm import Session
 from app.models.cv_files import CVFile
-from app.models import Candidature, Offre
+from app.models.models import Candidature
+from app.models.offres import Offre
 from app.services.parsing import parse_docx, parse_pdf, extract_info
 from app.services.scoring_auto import calculer_score_auto
 
