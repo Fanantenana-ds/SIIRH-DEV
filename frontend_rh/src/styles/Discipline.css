@@ -136,3 +136,24 @@ table tr:hover {
     padding: 15px;
   }
 }
+.autocomplete-list {
+  position: absolute; /* mipoitra eo ambanin'ny input */
+  background-color: #fff;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  max-height: 200px;
+  overflow-y: auto;
+  width: 100%; /* mitovy habe amin'ny input */
+  margin-top: 2px;
+  z-index: 1050; /* ambony noho modal */
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+}
+
+.autocomplete-item {
+  padding: 8px 10px;
+  cursor: pointer;
+}
+
+.autocomplete-item:hover {
+  background-color: #f1f7ff;
+}

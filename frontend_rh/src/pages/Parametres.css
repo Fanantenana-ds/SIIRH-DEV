@@ -69,15 +69,6 @@
   background-color: #10b981;
 }
 
-/* Bouton déconnexion */
-.btn-logout {
-  background-color: #ef4444;
-}
-
-.btn-logout:hover {
-  background-color: #dc2626;
-}
-
 /* Select */
 .param-select {
   border: 1px solid #d1d5db;
@@ -105,27 +96,7 @@ body.dark-mode .param-select {
   border-color: #555;
 }
 
-/* === Profil menu === */
-.profile-wrapper {
-  position: relative;
-  margin-top: 25px;
-}
-
-.profile-avatar {
-  width: 50px;
-  height: 50px;
-  border-radius: 50%;
-  cursor: pointer;
-  border: 2px solid #ccc;
-  object-fit: cover;
-  transition: 0.2s ease;
-}
-
-.profile-avatar:hover {
-  border-color: #007bff;
-  transform: scale(1.05);
-}
-
+/* === Profil / SMTP menu === */
 .profile-menu {
   position: relative;
   margin-top: 10px;
@@ -140,63 +111,37 @@ body.dark-mode .param-select {
   transition: all 0.3s ease;
 }
 
-/* Mode sombre pour profil-menu */
 body.dark-mode .profile-menu {
   background-color: #1f2937;
   color: #f3f4f6;
 }
 
-/* Input */
-.profile-menu input[type="email"],
-.profile-menu input[type="password"],
-.profile-menu input[type="text"] {
-  width: 100%;
-  padding: 6px 10px;
+/* Labels et inputs SMTP (nouvelle règle) */
+.profile-menu.smtp-menu label {
+  font-weight: 600;
+  color: #111827;  /* noir sur fond blanc */
+  display: block;
+  margin-bottom: 4px;
+}
+
+.profile-menu.smtp-menu input[type="email"],
+.profile-menu.smtp-menu input[type="password"] {
+  background-color: #ffffff; /* fond blanc pro */
+  color: #111827;           /* texte noir bien visible */
+  border: 1px solid #10b981; /* bordure verte */
   border-radius: 6px;
-  border: 1px solid #52a553;
+  padding: 10px 12px;
   font-size: 14px;
-  transition: 0.2s ease;
 }
 
-body.dark-mode .profile-menu input[type="email"],
-body.dark-mode .profile-menu input[type="password"],
-body.dark-mode .profile-menu input[type="text"] {
-  background-color: #374151;
-  color: #f9fafb;
-  border-color: #555;
+body.dark-mode .profile-menu.smtp-menu input[type="email"],
+body.dark-mode .profile-menu.smtp-menu input[type="password"] {
+  background-color: #ffffff; /* garde blanc même en dark mode */
+  color: #111827;            /* texte noir */
+  border-color: #10b981;     /* bordure verte */
 }
 
-.profile-menu input:focus {
-  outline: none;
-  border-color: #10b981;
-  box-shadow: 0 0 0 2px rgba(16,185,129,0.2);
-}
-
-/* Boutons internes profil */
-.profile-menu .btn-update {
-  background-color: #10b981;
-  color: white;
-  border: none;
-  border-radius: 6px;
-  padding: 8px;
-  cursor: pointer;
-  font-weight: 500;
-  transition: 0.2s ease;
-}
-
-.profile-menu .btn-update:hover {
-  background-color: #059669;
-}
-
-.profile-menu .btn-logout {
-  background-color: #ef4444;
-}
-
-.profile-menu .btn-logout:hover {
-  background-color: #dc2626;
-}
-
-/* Icone œil mot de passe */
+/* Eye icon */
 .eye-icon {
   position: absolute;
   right: 12px;
@@ -206,43 +151,15 @@ body.dark-mode .profile-menu input[type="text"] {
   font-size: 16px;
 }
 
-/* Texte du profil */
-.profile-menu div:first-child {
-  font-weight: 600;
-  font-size: 16px;
-}
-
-.profile-menu div:nth-child(2) {
-  font-size: 12px;
-  color: #555;
-}
-
-/* Responsive */
-@media (max-width: 500px) {
-  .param-card {
-    width: 90%;
-    padding: 20px;
-  }
-
-  .profile-avatar {
-    width: 40px;
-    height: 40px;
-  }
-}
-
-
-
-
-
-/* form general */
+/* Form général */
 .param-card form,
 .profile-menu form {
   display: flex;
   flex-direction: column;
-  gap: 12px;               /* espace entre champs */
+  gap: 12px; /* espace entre champs */
 }
 
-/* input group */
+/* Input group général */
 .input-group {
   display: flex;
   align-items: center;
@@ -251,86 +168,46 @@ body.dark-mode .profile-menu input[type="text"] {
 }
 
 .input-group input {
-  flex: 1;                 /* prend l'espace restant */
+  flex: 1;
   padding: 10px 12px;
-  border: 1px solid #d1d5db;
   border-radius: 8px;
+  border: 1px solid #d1d5db;
   background: #fff;
   color: #111827;
   font-size: 14px;
 }
 
-/* label style */
-.param-label, .form-label {
-  min-width: 120px;        /* largeur uniforme pour labels */
-  font-weight: 600;
-  color: #111827;
-}
-
-/* small screens */
-@media (max-width: 640px) {
-  .input-group {
-    flex-direction: column;
-    align-items: stretch;
-  }
-  .param-label { min-width: auto; margin-bottom: 4px; }
-}
-
-/* bouton principal */
-.param-btn, .btn-update, .submit-btn, .btn-logout {
+/* Boutons internes */
+.param-btn, .btn-update, .btn-submit, .btn-logout {
   padding: 10px 14px;
   border-radius: 10px;
   border: none;
   cursor: pointer;
   font-weight: 600;
-  background: linear-gradient(90deg,#3086e1,#1647db);
+  background: linear-gradient(90deg,#10b981,#059669);
   color: #fff;
+  transition: 0.3s;
 }
 
-/* bouton secondaire */
-.btn-secondary {
-  background: transparent;
-  border: 1px solid #d1d5db;
-  color: #111827;
+.param-btn:hover, .btn-update:hover, .btn-submit:hover {
+  background: linear-gradient(90deg,#059669,#047857);
 }
 
-/* disabled state */
-button:disabled, .btn-disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
+/* Déconnexion */
+.btn-logout {
+  background-color: #ef4444;
+}
+.btn-logout:hover {
+  background-color: #dc2626;
 }
 
-/* Dark mode overrides */
-body.dark-mode .input-group input,
-body.dark-mode input,
-body.dark-mode select,
-body.dark-mode textarea {
-  background: #222;
-  border-color: #333;
-  color: #fff;
+/* Messages */
+.msg.success { color: green; }
+.msg.error { color: #f43f5e; }
+
+/* Responsive */
+@media (max-width: 640px) {
+  .param-card { width: 90%; padding: 20px; }
+  .input-group { flex-direction: column; align-items: stretch; }
+  .param-label { min-width: auto; margin-bottom: 4px; }
 }
-
-body.dark-mode .param-label,
-body.dark-mode .param-card h2,
-body.dark-mode .profile-info,
-body.dark-mode .sidebar {
-  color: #f5f5f5;
-}
-
-body.dark-mode .param-btn {
-  background: linear-gradient(90deg,#374151,#111827);
-}
-
-
-
-
-
-
-.modal-backdrop {
-  position: fixed; inset: 0; display:flex; align-items:center; justify-content:center;
-  background: rgba(0,0,0,0.4); z-index: 2000;
-}
-.modal { background:#fff; padding:20px; border-radius:8px; width: 360px; }
-body.dark-mode .modal { background: #222; color: #fff; }
-.forgot-form input { width:100%; padding:10px; margin-bottom:10px; border-radius:8px; border:1px solid #ddd; }
-.msg.success { color: green; } .msg.error { color: #f43f5e; }

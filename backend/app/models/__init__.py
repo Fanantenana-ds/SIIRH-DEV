@@ -9,7 +9,6 @@ from .models import (
     Employee,
     Paie,
     Contrat,
-    Utilisateur,
     Convocation
 )
 

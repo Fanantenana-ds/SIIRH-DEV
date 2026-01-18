@@ -3,8 +3,8 @@ from fastapi import APIRouter, HTTPException, Depends
 from sqlalchemy.orm import Session
 from typing import List
 from app.db import get_db
-from app.models.models import Absence,Employee
-from app.schemas.absence import AbsenceCreate, AbsenceUpdate, AbsenceOut
+from app.models.models import Absence, Employee
+from app.schemas.absence import AbsenceCreate, AbsenceUpdate, AbsenceRead
 
 router = APIRouter(
     prefix="/api/absences",
@@ -12,12 +12,12 @@ router = APIRouter(
 )
 
 # 🔹 Liste de toutes les absences
-@router.get("/", response_model=List[AbsenceOut])
+@router.get("/", response_model=List[AbsenceRead])
 def list_absences(db: Session = Depends(get_db)):
     return db.query(Absence).all()
 
 # 🔹 Ajouter une absence
-@router.post("/", response_model=AbsenceOut)
+@router.post("/", response_model=AbsenceRead)
 def create_absence(absence: AbsenceCreate, db: Session = Depends(get_db)):
     employee = db.query(Employee).filter(Employee.id == absence.employee_id).first()
     if not employee:
@@ -25,8 +25,8 @@ def create_absence(absence: AbsenceCreate, db: Session = Depends(get_db)):
     
     new_absence = Absence(
         employee_id=absence.employee_id,
-        date_debut=absence.date_debut,   
-        date_fin=absence.date_fin,       
+        date_debut=absence.date_debut,
+        date_fin=absence.date_fin,
         type_absence=absence.type_absence,
         motif=absence.motif,
         statut=absence.statut or "en attente"
@@ -37,7 +37,7 @@ def create_absence(absence: AbsenceCreate, db: Session = Depends(get_db)):
     return new_absence
 
 # 🔹 Modifier une absence
-@router.put("/{absence_id}", response_model=AbsenceOut)
+@router.put("/{absence_id}", response_model=AbsenceRead)
 def update_absence(absence_id: int, data: AbsenceUpdate, db: Session = Depends(get_db)):
     absence = db.query(Absence).filter(Absence.id == absence_id).first()
     if not absence:

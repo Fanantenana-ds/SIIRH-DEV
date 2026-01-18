@@ -1,4 +1,4 @@
-#!/home/jeremi-seraphin/DATA/STAGE/SIIRH/backend/venv/bin/python3.12
+#!/home/jeremi-seraphin/STAGE/SIIRH/backend/venv/bin/python3
 import sys
 from fastapi.cli import main
 if __name__ == '__main__':

@@ -138,7 +138,6 @@
 
 
 
-
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from passlib.context import CryptContext
@@ -156,8 +155,8 @@ SECRET_KEY = "secretkeyfortoken123"
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 60
 
-# --- PASSWORD HASHER ---
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+# --- PASSWORD HASHER (argon2) ---
+pwd_context = CryptContext(schemes=["argon2"], deprecated="auto")
 
 # --- MODELS Pydantic ---
 class LoginRequest(BaseModel):
@@ -172,10 +171,10 @@ class ResetPasswordRequest(BaseModel):
     new_password: str
 
 # --- UTILITAIRES ---
-def verify_password(plain_password, hashed_password):
+def verify_password(plain_password: str, hashed_password: str):
     return pwd_context.verify(plain_password, hashed_password)
 
-def get_password_hash(password):
+def get_password_hash(password: str):
     return pwd_context.hash(password)
 
 def create_access_token(data: dict, expires_delta: timedelta | None = None):
@@ -200,8 +199,8 @@ def register_user(user: LoginRequest, db: Session = Depends(get_db)):
         username=user.email.split("@")[0],
         email=user.email,
         password=hashed_password,
-        role="user",    # compte standard
-        actif=True      # ✅ compte actif avy hatrany
+        role="user",
+        actif=True
     )
     db.add(new_user)
     db.commit()
@@ -234,7 +233,7 @@ def login_rh(request: LoginRequest, db: Session = Depends(get_db)):
 
 
 # --- FORGOT PASSWORD ---
-reset_tokens = {}  # stock temporaire {email: token}
+reset_tokens = {}
 
 @router.post("/forgot_password")
 def forgot_password(request: ForgotPasswordRequest, db: Session = Depends(get_db)):

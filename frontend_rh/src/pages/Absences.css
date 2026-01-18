@@ -1,190 +1,4 @@
-/* === Page absences === */
-.absences-page {
-  position: relative;
-  padding: 20px;
-  font-family: Arial, sans-serif;
-}
-
-/* === Header avec X et – === */
-.header-absences {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 15px;
-}
-
-.header-absences h2 {
-  margin: 0;
-  font-size: 1.5rem;
-}
-
-.window-controls button {
-  background: none;
-  border: none;
-  font-size: 1.2rem;
-  cursor: pointer;
-  margin-left: 5px;
-  padding: 2px 8px;
-}
-
-.window-controls button:hover {
-  background-color: #eee;
-}
-
-/* === Bouton pour afficher le formulaire === */
-.toggle-form-btn {
-  margin-bottom: 15px;
-  padding: 6px 12px;
-  cursor: pointer;
-  background-color: #007bff;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  font-size: 0.9rem;
-}
-
-.toggle-form-btn:hover {
-  background-color: #0056b3;
-}
-
-/* === Formulaire full page === */
-.absence-form {
-  margin-bottom: 40px;
-  padding: 20px;
-  border: 1px solid #ddd;
-  border-radius: 5px;
-  background-color: #fafafa;
-  width: 100%;
-  max-width: 1000px;
-}
-
-.absence-form label {
-  display: block;
-  margin-bottom: 15px;
-  font-size: 1rem;
-}
-
-.absence-form input,
-.absence-form select {
-  width: 100%;
-  padding: 8px 10px;
-  margin-top: 5px;
-  border: 1px solid #ccc;
-  border-radius: 3px;
-  font-size: 0.95rem;
-}
-
-/* === Datalist background blanc === */
-input[list] {
-  background-color: white;
-}
-
-/* === Boutons du formulaire === */
-.form-buttons {
-  display: flex;
-  justify-content: flex-start;
-  gap: 10px;
-  margin-top: 15px;
-}
-
-.form-buttons button {
-  padding: 6px 14px;
-  font-size: 0.95rem;
-  border-radius: 4px;
-  cursor: pointer;
-  border: none;
-}
-
-/* Ajouter / Modifier */
-.form-buttons button[type="submit"] {
-  background-color: #28a745;
-  color: white;
-}
-
-.form-buttons button[type="submit"]:hover {
-  background-color: #218838;
-}
-
-/* Annuler */
-.cancel-btn {
-  background-color: #dc3545;
-  color: white;
-}
-
-.cancel-btn:hover {
-  background-color: #c82333;
-}
-
-/* === Tableau === */
-.absence-table {
-  width: 100%;
-  border-collapse: collapse;
-}
-
-.absence-table th,
-.absence-table td {
-  border: 1px solid #ddd;
-  padding: 8px;
-  font-size: 0.9rem;
-}
-
-.absence-table th {
-  background-color: #f2f2f2;
-  text-align: left;
-}
-
-.absence-table td button {
-  margin-right: 5px;
-  cursor: pointer;
-  border: none;
-  background: none;
-  font-size: 1rem;
-}
-
-.absence-table td button:hover {
-  color: #007bff;
-}
-
-
-.absence-table td button {
-  background: none;
-  border: none;
-  cursor: pointer;
-  font-size: 1.2rem;
-  transition: transform 0.2s, color 0.2s;
-  color: #555; /* loko default */
-}
-
-.absence-table td button:hover {
-  color: #1d4ed8; /* loko rehefa hover */
-  transform: scale(1.2); /* kely ny enlarge rehefa hover */
-}
-
-
-
-/* === Header avec X et – === */
-.window-controls button {
-  background: none;
-  border: none;
-  font-size: 1.2rem;
-  cursor: pointer;
-  margin-left: 5px;
-  padding: 2px 8px;
-  color: #555; /* loko default: maity */
-  transition: color 0.2s, background-color 0.2s;
-}
-
-.window-controls button:hover {
-  background-color: #eee;
-  color: #1d4ed8; /* loko rehefa hover */
-}
-
-
-
-
-/* Absences.css => azo ampiasaina ho an'ny module feno Temps & Absences */
-
-/* ------------------- Page ------------------- */
+/* === Page absences / Temps & Absences === */
 .temps-absences-page {
   padding: 20px;
   font-family: Arial, sans-serif;
@@ -192,7 +6,7 @@ input[list] {
   min-height: 100vh;
 }
 
-/* ------------------- Header ------------------- */
+/* === Header === */
 .header {
   display: flex;
   flex-direction: column;
@@ -204,6 +18,7 @@ input[list] {
   color: #333;
 }
 
+/* === Tabs === */
 .tabs {
   display: flex;
   gap: 10px;
@@ -223,11 +38,7 @@ input[list] {
   background: #0056b3;
 }
 
-.tabs button:focus {
-  outline: none;
-}
-
-/* ------------------- Forms ------------------- */
+/* === Forms === */
 .tab-content form {
   background: #fff;
   padding: 15px;
@@ -255,7 +66,7 @@ input[list] {
   border: 1px solid #ccc;
 }
 
-/* Form Buttons */
+/* === Form Buttons === */
 .form-buttons {
   display: flex;
   gap: 10px;
@@ -270,12 +81,12 @@ input[list] {
 }
 
 .cancel-btn {
-  background: #ccc;
-  color: #333;
+  background: #dc3545;
+  color: #fff;
 }
 
 .cancel-btn:hover {
-  background: #999;
+  background: #c82333;
 }
 
 .form-buttons button[type="submit"] {
@@ -287,34 +98,27 @@ input[list] {
   background: #218838;
 }
 
-/* ------------------- Tables ------------------- */
+/* === Tableaux === */
 .tab-content table {
-  width: max-content;
-  min-width: 100%;
+  width: 100%;
   border-collapse: collapse;
   margin-top: 10px;
   background: #fff;
   border-radius: 6px;
-  overflow-x: auto !important;
-  display: block; /* ✔ Ilaiko atao block mba haseho colonnes rehetra */
-  .tab-content table th,
-  .tab-content table td {
-   min-width: 120px;   /* ✔ Tsy ho 0px intsony ny width */
-  }
-  
+  overflow-x: auto;
 }
-
 
 .tab-content table th,
 .tab-content table td {
   padding: 10px;
   text-align: left;
-  border-bottom: 1px solid #eee;
   font-size: 14px;
+  border-bottom: 1px solid #eee;
+  white-space: nowrap;
 }
 
 .tab-content table th {
-  background: #007bff;
+  background-color: #1e7e34; /* vert foncé entête */
   color: #fff;
 }
 
@@ -322,29 +126,46 @@ input[list] {
   background: #f1f1f1;
 }
 
+/* === Boutons Actions dans le tableau === */
 .tab-content table td button {
   margin-right: 5px;
   padding: 4px 8px;
   border: none;
   border-radius: 4px;
   cursor: pointer;
-}
-
-.tab-content table td button:hover {
-  opacity: 0.8;
+  font-size: 0.95rem;
+  transition: transform 0.2s, background-color 0.2s;
 }
 
 .tab-content table td button:first-child {
-  background: #ffc107;
+  background: #ffc107; /* éditer */
   color: #fff;
+}
+
+.tab-content table td button:first-child:hover {
+  transform: scale(1.1);
+}
+
+.tab-content table td button:nth-child(2) {
+  background: #dc3545; /* supprimer */
+  color: #fff;
+}
+
+.tab-content table td button:nth-child(2):hover {
+  transform: scale(1.1);
 }
 
 .tab-content table td button:last-child {
-  background: #dc3545;
+  background-color: #28a745; /* détails popup */
   color: #fff;
 }
 
-/* ------------------- Export Button ------------------- */
+.tab-content table td button:last-child:hover {
+  transform: scale(1.1);
+  background-color: #218838;
+}
+
+/* === Export Button === */
 .tab-content h3 {
   margin-top: 20px;
   margin-bottom: 10px;
@@ -364,7 +185,49 @@ input[list] {
   background: #117a8b;
 }
 
-/* ------------------- Responsive ------------------- */
+/* === Popup détails === */
+.popup-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.popup-content {
+  background: #fff;
+  padding: 20px;
+  border-radius: 6px;
+  width: 90%;
+  max-width: 500px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+}
+
+.popup-content h3 {
+  margin-top: 0;
+  color: #1e7e34; /* vert foncé */
+}
+
+.popup-content button {
+  margin-top: 15px;
+  padding: 6px 12px;
+  background: #28a745;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.popup-content button:hover {
+  background: #218838;
+}
+
+/* === Responsive === */
 @media (max-width: 768px) {
   .tabs {
     flex-direction: column;
@@ -379,19 +242,4 @@ input[list] {
     font-size: 12px;
     padding: 6px;
   }
-}
-
-/* --- FIX TABLE EXPORT --- */
-.tab-content table {
-  width: 100% !important;
-  border-collapse: collapse !important;
-  table-layout: auto !important;
-  overflow-x: auto !important; /* mba hanaovana scroll raha be colonne */
-  display: table !important;  /* ✔ averina ho table izy fa tsy block */
-}
-
-.tab-content table th,
-.tab-content table td {
-  min-width: 120px !important; /* ✔ manakana azy tsy ho 0px */
-  white-space: nowrap;
 }

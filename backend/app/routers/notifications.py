@@ -13,6 +13,7 @@ router = APIRouter()
 async def get_notifications():
     """
     Retourne toutes les notifications triées par date décroissante.
+    Convert 'read' en boolean pour que le frontend puisse gérer le badge.
     """
     try:
         query = sqlalchemy.text("SELECT id, message, read, date FROM notifications ORDER BY date DESC")
@@ -24,6 +25,8 @@ async def get_notifications():
                 # Formatage de la date en ISO
                 if r.get("date"):
                     r["date"] = r["date"].isoformat()
+                # Assurer que read dia boolean
+                r["read"] = bool(r.get("read"))
                 notifications.append(r)
         return notifications
     except Exception as e:

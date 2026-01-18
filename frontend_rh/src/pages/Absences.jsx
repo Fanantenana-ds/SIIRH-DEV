@@ -1,12 +1,14 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import "./Absences.css";
+import "../styles/TempsAbsences.css";
+
 
 export default function TempsAbsences({ navigateToDashboard }) {
   const API_BASE = "http://127.0.0.1:8000/api";
-
+  
   const [tab, setTab] = useState("absences");
   const [employees, setEmployees] = useState([]);
+  const [searchEmployee, setSearchEmployee] = useState("");
 
   // -----------------------------
   // Absences
@@ -48,9 +50,15 @@ export default function TempsAbsences({ navigateToDashboard }) {
 
   // Soldes
   const [soldes, setSoldes] = useState([]);
+  const calculateDays = (start, end) => { const sd = new Date(start); const ed = new Date(end); return Math.ceil((ed - sd)/(1000*60*60*24)) + 1; };
+
 
   // Export
   const [exportData, setExportData] = useState([]);
+
+  // -----------------------------
+  // Popup pour détails
+  const [popupData, setPopupData] = useState(null);
 
   // -----------------------------
   // Fetch Employees
@@ -96,22 +104,14 @@ export default function TempsAbsences({ navigateToDashboard }) {
   const handleTabChange = (newTab) => {
     setTab(newTab);
   };
+  const filterByEmployee = list => !searchEmployee ? list : list.filter(item => { const emp = employees.find(e => e.id === item.employee_id); if (!emp) return false; const fullName = `${emp.nom} ${emp.prenom}`.toLowerCase(); return fullName.includes(searchEmployee.toLowerCase()); });
+
 
   // -----------------------------
-  // Absences Handlers
-  const handleAbsenceChange = (e) => setAbsenceForm({ ...absenceForm, [e.target.name]: e.target.value });
-  const handleAbsenceSubmit = async (e) => {
-    e.preventDefault();
-    try {
-      if (editingAbsenceId) await axios.put(`${API_BASE}/absences/${editingAbsenceId}`, absenceForm);
-      else await axios.post(`${API_BASE}/absences/`, absenceForm);
+  // Handlers Absences
+  const handleAbsenceChange = e => setAbsenceForm({ ...absenceForm, [e.target.name]: e.target.value });
+  const handleAbsenceSubmit = async (e) => { e.preventDefault(); try { if(editingAbsenceId) await axios.put(`${API_BASE}/absences/${editingAbsenceId}`,absenceForm); else await axios.post(`${API_BASE}/absences/`,absenceForm); if(absenceForm.statut==="validée") setSoldes(prev=>prev.map(s=>s.employee_id===absenceForm.employee_id?{...s,absences_non_payees:s.absences_non_payees+calculateDays(absenceForm.date_debut,absenceForm.date_fin)}:s)); setAbsenceForm({employee_id:"",date_debut:"",date_fin:"",type_absence:"maladie",statut:"en attente",motif:""}); setEditingAbsenceId(null); setShowAbsenceForm(false); fetchData(); } catch(err){console.error("Erreur sauvegarde :",err);} };
 
-      setAbsenceForm({ employee_id: "", date_debut: "", date_fin: "", type_absence: "maladie", statut: "en attente", motif: "" });
-      setEditingAbsenceId(null);
-      setShowAbsenceForm(false);
-      fetchData();
-    } catch (err) { console.error("Erreur sauvegarde :", err); }
-  };
   const handleAbsenceEdit = (a) => {
     setAbsenceForm({ employee_id: a.employee_id, date_debut: a.date_debut, date_fin: a.date_fin, type_absence: a.type_absence, statut: a.statut, motif: a.motif || "" });
     setEditingAbsenceId(a.id);
@@ -124,7 +124,7 @@ export default function TempsAbsences({ navigateToDashboard }) {
   };
 
   // -----------------------------
-  // Pointages Handlers
+  // Handlers Pointages
   const handlePointageChange = (e) => setPointageForm({ ...pointageForm, [e.target.name]: e.target.value });
   const handlePointageSubmit = async (e) => {
     e.preventDefault();
@@ -142,54 +142,77 @@ export default function TempsAbsences({ navigateToDashboard }) {
   const handlePointageDelete = async (id) => { if (!window.confirm("Confirmer la suppression ?")) return; await axios.delete(`${API_BASE}/pointages/${id}`); fetchData(); };
 
   // -----------------------------
-  // Congés Handlers
+  // Handlers Congés
   const handleCongeChange = (e) => setCongeForm({ ...congeForm, [e.target.name]: e.target.value });
-  const handleCongeSubmit = async (e) => {
-    e.preventDefault();
-    try {
-      if (editingCongeId) await axios.put(`${API_BASE}/conges/${editingCongeId}`, congeForm);
-      else await axios.post(`${API_BASE}/conges/`, congeForm);
+  const handleCongeSubmit = async (e) => { e.preventDefault(); try { if(editingCongeId) await axios.put(`${API_BASE}/conges/${editingCongeId}`,congeForm); else await axios.post(`${API_BASE}/conges/`,congeForm); if(congeForm.statut==="validée") setSoldes(prev=>prev.map(s=>s.employee_id===congeForm.employee_id?{...s,conges_pris:s.conges_pris+calculateDays(congeForm.date_debut,congeForm.date_fin)}:s)); setCongeForm({employee_id:"",date_debut:"",date_fin:"",type_conge:"annuel",statut:"en attente",motif:""}); setEditingCongeId(null); setShowCongeForm(false); fetchData(); } catch(err){console.error("Erreur congé :",err);} };
 
-      setCongeForm({ employee_id: "", date_debut: "", date_fin: "", type_conge: "annuel", statut: "en attente", motif: "" });
-      setEditingCongeId(null);
-      setShowCongeForm(false);
-      fetchData();
-    } catch (err) { console.error("Erreur congé :", err); }
-  };
   const handleCongeEdit = (c) => { setCongeForm({ employee_id: c.employee_id, date_debut: c.date_debut, date_fin: c.date_fin, type_conge: c.type_conge, statut: c.statut, motif: c.motif || "" }); setEditingCongeId(c.id); setShowCongeForm(true); };
   const handleCongeDelete = async (id) => { if (!window.confirm("Confirmer la suppression ?")) return; await axios.delete(`${API_BASE}/conges/${id}`); fetchData(); };
 
   // -----------------------------
-  // Export CSV / Excel
+  // Soldes
+  const buildPayrollExport = (mois, annee) => employees.map(emp => { const empPointages = pointages.filter(p => p.employee_id === emp.id && new Date(p.date).getMonth() + 1 === mois && new Date(p.date).getFullYear() === annee); let heuresNormales = 0, heuresSup = 0; empPointages.forEach(p => { const diff = (new Date(`1970-01-01T${p.heure_sortie}`) - new Date(`1970-01-01T${p.heure_entree}`)) / 36e5; diff > 8 ? (heuresNormales += 8, heuresSup += diff - 8) : heuresNormales += diff; }); const absencesJours = absences.filter(a => a.employee_id === emp.id && a.statut === "validée").reduce((s,a)=>s+calculateDays(a.date_debut,a.date_fin),0); const congesNonPayes = conges.filter(c => c.employee_id === emp.id && c.statut === "validée" && c.type_conge !== "annuel").reduce((s,c)=>s+calculateDays(c.date_debut,c.date_fin),0); return { employe: `${emp.nom} ${emp.prenom}`, periode: `${mois.toString().padStart(2,"0")}/${annee}`, heures_normales: heuresNormales.toFixed(2), heures_supplementaires: heuresSup.toFixed(2), absences_jours: absencesJours, conges_non_payes_jours: congesNonPayes }; });
   const handleExport = (format) => {
-    if (!exportData.length) return alert("Aucune donnée à exporter");
-    const rows = exportData.map(e => {
-      const emp = employees.find(emp => emp.id === e.employee_id);
-      return { Employe: emp ? `${emp.nom} ${emp.prenom}` : "—", Mois: e.mois, Salaire: e.salaire };
+  const mois = parseInt(window.prompt("Mois (1-12)"));
+  const annee = parseInt(window.prompt("Année (ex: 2026)"));
+  if (!mois || !annee) return alert("Période invalide");
+
+  const rows = employees.map(emp => {
+    // POINTAGES
+    const empPointages = pointages.filter(p => {
+      const d = new Date(p.date);
+      return p.employee_id === emp.id && d.getMonth() + 1 === mois && d.getFullYear() === annee;
+    });
+    let heuresNormales = 0, heuresSup = 0;
+    empPointages.forEach(p => {
+      const hIn = new Date(`1970-01-01T${p.heure_entree}`);
+      const hOut = new Date(`1970-01-01T${p.heure_sortie}`);
+      const diff = (hOut - hIn) / (1000 * 60 * 60);
+      if (diff > 8) { heuresNormales += 8; heuresSup += diff - 8; } 
+      else { heuresNormales += diff; }
     });
 
-    if (format === "csv") {
-      let csvContent = "data:text/csv;charset=utf-8," + ["Employe,Mois,Salaire", ...rows.map(r => `${r.Employe},${r.Mois},${r.Salaire}`)].join("\n");
-      const encodedUri = encodeURI(csvContent);
-      const link = document.createElement("a");
-      link.setAttribute("href", encodedUri);
-      link.setAttribute("download", "export_paie.csv");
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-    } else if (format === "excel") {
-      // Simple Excel export using HTML table format
-      let table = "<table><tr><th>Employé</th><th>Mois</th><th>Salaire</th></tr>";
-      rows.forEach(r => { table += `<tr><td>${r.Employe}</td><td>${r.Mois}</td><td>${r.Salaire}</td></tr>`; });
-      table += "</table>";
-      const uri = "data:application/vnd.ms-excel," + encodeURIComponent(table);
-      const link = document.createElement("a");
-      link.href = uri;
-      link.download = "export_paie.xls";
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-    }
+    // ABSENCES VALIDÉES
+    const absencesJours = absences
+      .filter(a => a.employee_id === emp.id && a.statut === "validée")
+      .reduce((sum, a) => sum + calculateDays(a.date_debut, a.date_fin), 0);
+
+    // CONGÉS NON PAYÉS (VALIDÉS)
+    const congesNonPayes = conges
+      .filter(c => c.employee_id === emp.id && c.statut === "validée" && c.type_conge !== "annuel")
+      .reduce((sum, c) => sum + calculateDays(c.date_debut, c.date_fin), 0);
+
+    return {
+      Employé: `${emp.nom} ${emp.prenom}`,
+      Période: `${mois.toString().padStart(2,"0")}/${annee}`,
+      "Heures normales": heuresNormales.toFixed(2),
+      "Heures supplémentaires": heuresSup.toFixed(2),
+      "Absences (jours)": absencesJours,
+      "Congés non payés (jours)": congesNonPayes
+    };
+  });
+
+  if (format === "csv") {
+    const header = Object.keys(rows[0]).join(",") + "\n";
+    const body = rows.map(r => Object.values(r).join(",")).join("\n");
+    const blob = new Blob([header + body], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `export_paie_${mois}_${annee}.csv`;
+    link.click();
+  }
+};
+  // -----------------------------
+  // Ouvrir popup détails
+  const openPopup = (type, employee_id) => {
+    const emp = employees.find(e => e.id === employee_id);
+    let data = [];
+    if (type === "absence") data = absences.filter(a => a.employee_id === employee_id);
+    else if (type === "pointage") data = pointages.filter(p => p.employee_id === employee_id);
+    else if (type === "conge") data = conges.filter(c => c.employee_id === employee_id);
+
+    setPopupData({ type, emp, data });
   };
 
   // -----------------------------
@@ -207,8 +230,10 @@ export default function TempsAbsences({ navigateToDashboard }) {
         </div>
       </div>
 
+      {/* ------------------ Absences ------------------ */}
       {tab === "absences" && (
         <div className="tab-content">
+          <input type="text" placeholder="Rechercher par employé..." value={searchEmployee} onChange={e => setSearchEmployee(e.target.value)} style={{ marginBottom: "10px", width: "300px" }} />
           <button onClick={() => setShowAbsenceForm(!showAbsenceForm)}>{showAbsenceForm ? "Masquer Formulaire" : "Créer une absence"}</button>
           {showAbsenceForm && (
             <form onSubmit={handleAbsenceSubmit}>
@@ -231,20 +256,16 @@ export default function TempsAbsences({ navigateToDashboard }) {
               <button type="submit">{editingAbsenceId ? "Modifier" : "Ajouter"}</button>
             </form>
           )}
-          <table>
-            <thead><tr><th>Employé</th><th>Début</th><th>Fin</th><th>Type</th><th>Statut</th><th>Motif</th><th>Actions</th></tr></thead>
-            <tbody>{absences.map(a => {
-              const emp = employees.find(e => e.id === a.employee_id);
-              return <tr key={a.id}><td>{emp ? `${emp.nom} ${emp.prenom}` : "—"}</td><td>{a.date_debut}</td><td>{a.date_fin}</td><td>{a.type_absence}</td><td>{a.statut}</td><td>{a.motif || "—"}</td>
-                <td><button onClick={() => handleAbsenceEdit(a)}>✏️</button><button onClick={() => handleAbsenceDelete(a.id)}>🗑️</button></td>
-              </tr>;
-            })}</tbody>
-          </table>
+          <table><thead><tr><th>#</th><th>Employé</th><th>Détail</th><th>Actions</th></tr></thead><tbody>{[...new Map(filterByEmployee(absences).map(a=>[a.employee_id,a])).values()].map((a,i)=>{const emp=employees.find(e=>e.id===a.employee_id);return <tr key={a.employee_id}><td>{i+1}</td><td>{emp?`${emp.nom} ${emp.prenom}`:"—"}</td><td><button onClick={()=>openPopup("absence",a.employee_id)}>⋮</button></td><td><button onClick={()=>handleAbsenceEdit(a)}>✏️</button><button onClick={()=>handleAbsenceDelete(a.id)}>🗑️</button></td></tr>;})}</tbody></table>
+
         </div>
       )}
 
+      {/* ------------------ Pointages ------------------ */}
       {tab === "pointages" && (
         <div className="tab-content">
+          <input type="text" placeholder="Rechercher par employé..." value={searchEmployee} onChange={e => setSearchEmployee(e.target.value)} style={{ marginBottom: "10px", width: "300px" }} />
+
           <button onClick={() => setShowPointageForm(!showPointageForm)}>{showPointageForm ? "Masquer Formulaire" : "Créer un pointage"}</button>
           {showPointageForm && (
             <form onSubmit={handlePointageSubmit}>
@@ -257,20 +278,16 @@ export default function TempsAbsences({ navigateToDashboard }) {
               <button type="submit">{editingPointageId ? "Modifier" : "Ajouter"}</button>
             </form>
           )}
-          <table>
-            <thead><tr><th>Employé</th><th>Date</th><th>Heure Entrée</th><th>Heure Sortie</th><th>Actions</th></tr></thead>
-            <tbody>{pointages.map(p => {
-              const emp = employees.find(e => e.id === p.employee_id);
-              return <tr key={p.id}><td>{emp ? `${emp.nom} ${emp.prenom}` : "—"}</td><td>{p.date}</td><td>{p.heure_entree}</td><td>{p.heure_sortie}</td>
-                <td><button onClick={() => handlePointageEdit(p)}>✏️</button><button onClick={() => handlePointageDelete(p.id)}>🗑️</button></td>
-              </tr>;
-            })}</tbody>
-          </table>
+          <table><thead><tr><th>#</th><th>Employé</th><th>Détail</th><th>Actions</th></tr></thead><tbody>{[...new Map(filterByEmployee(pointages).map(p=>[p.employee_id,p])).values()].map((p,i)=>{const emp=employees.find(e=>e.id===p.employee_id);return <tr key={p.employee_id}><td>{i+1}</td><td>{emp?`${emp.nom} ${emp.prenom}`:"—"}</td><td><button onClick={()=>openPopup("pointage",p.employee_id)}>⋮</button></td><td><button onClick={()=>handlePointageDelete(p.id)}>🗑️</button></td></tr>;})}</tbody></table>
+
         </div>
       )}
 
+      {/* ------------------ Congés ------------------ */}
       {tab === "conges" && (
         <div className="tab-content">
+          <input type="text" placeholder="Rechercher par employé..." value={searchEmployee} onChange={e => setSearchEmployee(e.target.value)} style={{ marginBottom: "10px", width: "300px" }} />
+
           <button onClick={() => setShowCongeForm(!showCongeForm)}>{showCongeForm ? "Masquer Formulaire" : "Créer un congé"}</button>
           {showCongeForm && (
             <form onSubmit={handleCongeSubmit}>
@@ -293,49 +310,67 @@ export default function TempsAbsences({ navigateToDashboard }) {
               <button type="submit">{editingCongeId ? "Modifier" : "Ajouter"}</button>
             </form>
           )}
-          <table>
-            <thead><tr><th>Employé</th><th>Début</th><th>Fin</th><th>Type</th><th>Statut</th><th>Motif</th><th>Actions</th></tr></thead>
-            <tbody>{conges.map(c => {
-              const emp = employees.find(e => e.id === c.employee_id);
-              return <tr key={c.id}><td>{emp ? `${emp.nom} ${emp.prenom}` : "—"}</td><td>{c.date_debut}</td><td>{c.date_fin}</td><td>{c.type_conge}</td><td>{c.statut}</td><td>{c.motif || "—"}</td>
-                <td><button onClick={() => handleCongeEdit(c)}>✏️</button><button onClick={() => handleCongeDelete(c.id)}>🗑️</button></td>
-              </tr>;
-            })}</tbody>
-          </table>
+          <table><thead><tr><th>#</th><th>Employé</th><th>Détail</th><th>Actions</th></tr></thead><tbody>{[...new Map(filterByEmployee(conges).map(c=>[c.employee_id,c])).values()].map((c,i)=>{const emp=employees.find(e=>e.id===c.employee_id);return <tr key={c.employee_id}><td>{i+1}</td><td>{emp?`${emp.nom} ${emp.prenom}`:"—"}</td><td><button onClick={()=>openPopup("conge",c.employee_id)}>⋮</button></td><td><button onClick={()=>handleCongeEdit(c)}>✏️</button><button onClick={()=>handleCongeDelete(c.id)}>🗑️</button></td></tr>;})}</tbody></table>
+
         </div>
       )}
 
+      {/* ------------------ Soldes ------------------ */}
       {tab === "soldes" && (
         <div className="tab-content">
+          <input type="text" placeholder="Rechercher par employé..." value={searchEmployee} onChange={e => setSearchEmployee(e.target.value)} style={{ marginBottom: "10px", width: "300px" }} />
+
           <h3>Soldes des employés</h3>
+          <table><thead><tr><th>Rang</th><th>Employé</th><th>Congés pris</th><th>Absences non payées</th><th>Solde congés</th></tr></thead><tbody>{filterByEmployee(soldes).map((s,i)=>{const emp=employees.find(e=>e.id===s.employee_id);const congesPris=s.conges_pris;const absencesNonPayees=s.absences_non_payees;const soldeConges=30-congesPris;return <tr key={s.employee_id}><td>{i+1}</td><td>{emp?`${emp.nom} ${emp.prenom}`:"—"}</td><td>{congesPris}</td><td>{absencesNonPayees}</td><td>{soldeConges}</td></tr>;})}</tbody></table>
+
+        </div>
+      )}
+
+      {/* ------------------ Export ------------------ */}
+      {tab === "export" && (
+        <div className="tab-content">
+          <input type="text" placeholder="Rechercher par employé..." value={searchEmployee} onChange={e => setSearchEmployee(e.target.value)} style={{ marginBottom: "10px", width: "300px" }} />
+          <h3>Export Paie</h3>
+          <select onChange={e => e.target.value && handleExport(e.target.value)} defaultValue=""><option value="" disabled>Exporter Paie</option><option value="csv">CSV</option><option value="excel">Excel</option></select>
           <table>
-            <thead><tr><th>Employé</th><th>Solde Congés</th></tr></thead>
-            <tbody>{soldes.map(s => {
-              const emp = employees.find(e => e.id === s.employee_id);
-              return <tr key={s.employee_id}><td>{emp ? `${emp.nom} ${emp.prenom}` : "—"}</td><td>{s.solde_conges}</td></tr>;
-            })}</tbody>
+            <thead><tr><th>Employé</th><th>Période</th><th>Heures normales</th><th>Heures supplémentaires</th><th>Absences (jours)</th><th>Congés non payés (jours)</th></tr></thead>
+            <tbody>{employees.filter(emp=>!searchEmployee||`${emp.nom} ${emp.prenom}`.toLowerCase().includes(searchEmployee.toLowerCase())).map(emp=>{const mois=new Date().getMonth()+1,annee=new Date().getFullYear(),empPointages=pointages.filter(p=>p.employee_id===emp.id&&new Date(p.date).getMonth()+1===mois&&new Date(p.date).getFullYear()===annee);let heuresNormales=0,heuresSup=0;empPointages.forEach(p=>{const hIn=new Date(`1970-01-01T${p.heure_entree}`),hOut=new Date(`1970-01-01T${p.heure_sortie}`),diff=(hOut-hIn)/(1000*60*60);diff>8?(heuresNormales+=8,heuresSup+=diff-8):heuresNormales+=diff;});const absencesJours=absences.filter(a=>a.employee_id===emp.id&&a.statut==="validée").reduce((s,a)=>s+calculateDays(a.date_debut,a.date_fin),0);const congesNonPayes=conges.filter(c=>c.employee_id===emp.id&&c.statut==="validée"&&c.type_conge!=="annuel").reduce((s,c)=>s+calculateDays(c.date_debut,c.date_fin),0);return <tr key={emp.id}><td>{emp.nom} {emp.prenom}</td><td>{mois.toString().padStart(2,"0")}/{annee}</td><td>{heuresNormales.toFixed(2)}</td><td>{heuresSup.toFixed(2)}</td><td>{absencesJours}</td><td>{congesNonPayes}</td></tr>;})}</tbody>
           </table>
         </div>
       )}
 
-      {tab === "export" && (
-        <div className="tab-content">
-          <h3>Export Paie</h3>
-          <button onClick={() => {
-            const choice = window.prompt("Tapez 'csv' pour CSV ou 'excel' pour Excel");
-            if (choice === "csv") handleExport("csv");
-            else if (choice === "excel") handleExport("excel");
-          }}>Télécharger Export</button>
+      {/* ------------------ Popup Détails ------------------ */}
+      {popupData && (
+        <div className="popup-overlay" onClick={() => setPopupData(null)}>
+          <div className="popup-content" onClick={(e) => e.stopPropagation()}>
+            <h3>Détails {popupData.type}</h3>
+            <p><strong>Employé :</strong> {popupData.emp ? `${popupData.emp.nom} ${popupData.emp.prenom}` : "—"}</p>
+            {popupData.type === "pointage" && <p>{popupData.data.length}/{["Janvier","Février","Mars","Avril","Mai","Juin","Juillet","Août","Septembre","Octobre","Novembre","Décembre"][new Date(popupData.data[0].date).getMonth()]}</p>}
 
-          <table>
-            <thead><tr><th>Employé</th><th>Mois</th><th>Salaire</th></tr></thead>
-            <tbody>{exportData.map(e => {
-              const emp = employees.find(emp => emp.id === e.employee_id);
-              return <tr key={e.id}><td>{emp ? `${emp.nom} ${emp.prenom}` : "—"}</td><td>{e.mois}</td><td>{e.salaire}</td></tr>;
-            })}</tbody>
-          </table>
+            {popupData.data.length === 0 ? (
+              <p>Aucune donnée</p>
+            ) : (
+              <ul>
+                {popupData.data.map((d, idx) => (
+                  <li key={idx}>
+                    {popupData.type === "absence" && `Du ${d.date_debut} au ${d.date_fin} — Type: ${d.type_absence} — Statut: ${d.statut} — Motif: ${d.motif || "—"}`}
+                    {popupData.type === "pointage" && `Date: ${d.date} — Entrée: ${d.heure_entree} — Sortie: ${d.heure_sortie}`}
+                    {popupData.type === "conge" && `Du ${d.date_debut} au ${d.date_fin} — Type: ${d.type_conge} — Statut: ${d.statut} — Motif: ${d.motif || "—"}`}
+                  </li>
+                ))}
+              </ul>
+            )}
+            <button onClick={() => setPopupData(null)}>Fermer</button>
+          </div>
         </div>
       )}
     </div>
   );
 }
+
+
+
+
+
+
+ 
