@@ -16,3 +16,5 @@ node_modules/
 __pycache__/
 .env
 *.pyc
+backend/minio
+backend/minio
