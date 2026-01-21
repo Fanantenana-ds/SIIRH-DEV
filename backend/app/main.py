@@ -24,8 +24,7 @@ from app.routers import soldes, export_paie
 from app.routers import time_entries, leaves, payroll, absences
 from app.routers.pointages import router as pointages_router 
 from app.routers import settings_smtp
-
-
+from app.routers import mail_listener
 
 # ==========================================================
 # 🚀 CONFIGURATION GÉNÉRALE
@@ -80,8 +79,14 @@ app.include_router(time_entries.router)      # /api/pointages
 app.include_router(leaves.router)          # /api/conges
 app.include_router(payroll.router)           # /api/payroll
 
+# 🔹 Ajout du router formulaire public candidatures (MinIO)
+from app.routers import candidatures  # ✅ router misy create_candidature
+app.include_router(candidatures.router, prefix="/api/candidatures", tags=["Candidatures Public"])
+
 app.mount("/exports", StaticFiles(directory="app/exports"), name="exports")
 app.include_router(settings_smtp.router, prefix="/api")
+app.include_router(mail_listener.router)
+
 # ==========================================================
 # 🧾 FORMULAIRE DE CANDIDATURE
 # ==========================================================
