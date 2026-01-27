@@ -1,4 +1,3 @@
-// src/components/Absences.jsx
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import "../styles/Absences.css";

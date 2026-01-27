@@ -1,4 +1,3 @@
-// src/components/ForgotPasswordModal.jsx
 import React, { useState } from "react";
 
 export default function ForgotPasswordModal({ onClose }) {

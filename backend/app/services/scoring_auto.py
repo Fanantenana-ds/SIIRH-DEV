@@ -1,39 +1,3 @@
-# import re
-# from difflib import SequenceMatcher
-
-# def calculer_score_auto(cv_text: str, offre) -> float:
-#     """
-#     Calcule un score automatique à partir du contenu de l'offre et du CV.
-#     """
-#     score = 0
-
-#     # --- 1️⃣ Analyse des compétences demandées ---
-#     if offre.competences:
-#         competences = [c.strip().lower() for c in offre.competences.split(",")]
-#         for comp in competences:
-#             if re.search(rf"\b{comp}\b", cv_text.lower()):
-#                 score += 10  # +10 points par compétence trouvée
-
-#     # --- 2️⃣ Analyse des exigences (formation/expérience) ---
-#     if offre.description:
-#         simil = SequenceMatcher(None, cv_text.lower(), offre.description.lower()).ratio()
-#         score += simil * 20  # pondération 20%
-
-#     if offre.exigences:
-#         simil2 = SequenceMatcher(None, cv_text.lower(), offre.exigences.lower()).ratio()
-#         score += simil2 * 20
-
-#     # --- 3️⃣ Bonus expérience (nombre d'années) ---
-#     match = re.search(r"\b(\d+)\s+ans\b", cv_text.lower())
-#     if match:
-#         nb_ans = int(match.group(1))
-#         score += min(nb_ans * 2, 20)
-
-#     # --- 4️⃣ Score max 100 ---
-#     return min(round(score, 2), 100)
-
-
-
 import re
 from difflib import SequenceMatcher
 
@@ -113,3 +77,6 @@ def calculer_score_auto(cv_text: str, offre: dict, projets_keywords: list = None
         "score": score,
         "passed_threshold": passed_threshold
     }
+
+
+
