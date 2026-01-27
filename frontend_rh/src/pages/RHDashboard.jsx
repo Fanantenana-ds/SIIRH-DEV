@@ -351,7 +351,7 @@ const RHDashboard = () => {
                             : `${c.date_candidature ? new Date(c.date_candidature).toLocaleDateString() : "—"}`} 
                         </td>
                       )}
-                      {view !== "employees" && <td>{view === "fait_entretien" ? `${c.score_total}/5` : c.score_total || "—"}</td>}
+                      <td>{view === "fait_entretien" ? `${c.score_total}/5` : (c.score_total !== null && c.score_total !== undefined ? c.score_total : "0")}</td>
                       {view !== "employees" && <td className={`decision ${c.statut === "Sélectionné" ? "go" : c.statut === "Convoqué" ? "blue" : c.statut === "Désélectionné" ? "danger" : "hold"}`}>{c.decision || c.statut}</td>}
 
                       {view === "convoque" && selectedConvoques.includes(c.id) && (
