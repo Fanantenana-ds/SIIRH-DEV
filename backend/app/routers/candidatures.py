@@ -277,7 +277,7 @@ def create_candidature(
     nom: str = Form(...),
     prenom: str = Form(...),
     email: str = Form(...),
-    phone: str = Form(None),
+    telephone: str = Form(...),
     adresse: str = Form(None),
     date_naissance: str = Form(None),
     poste: str = Form(...),
@@ -337,15 +337,17 @@ def create_candidature(
     # Création candidature
     # ==================================================
     new_candidature = Candidature(
-        fullname=f"{prenom} {nom}",
+        nom=nom,
+        prenom=prenom,
         email=email,
-        phone=phone,
+        telephone=phone or "",
         source="formulaire",
         raw_cv_s3=None,
         score=score_global,
         statut="En attente",
         offre_id=offre.id,
     )
+
 
     db.add(new_candidature)
     db.commit()
@@ -372,3 +374,4 @@ def create_candidature(
     return new_candidature
 
 
+phone: str = Form(None),

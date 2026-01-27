@@ -59,6 +59,7 @@ def list_paies(db: Session = Depends(get_db)):
 
 @router.post("/", response_model=PaieOut)
 def create_paie(data: PaieCreate, db: Session = Depends(get_db)):
+    print("Payload reçu:", data.dict())
     employee = db.query(Employee).filter(Employee.id == data.employee_id).first()
     if not employee:
         raise HTTPException(404, "Employé introuvable")

@@ -10,9 +10,9 @@ from email.mime.multipart import MIMEMultipart
 from email.mime.base import MIMEBase
 from email import encoders
 from datetime import datetime
+from sqlalchemy import text
 
 router = APIRouter()
-SMTP_FILE = "smtp_config.json"
 
 # ------------------- Pydantic Model -------------------
 class SMTPSettings(BaseModel):
@@ -21,24 +21,45 @@ class SMTPSettings(BaseModel):
 
 # ------------------- GET SMTP -------------------
 @router.get("/settings/smtp")
-def get_smtp():
-    if os.path.exists(SMTP_FILE):
-        with open(SMTP_FILE, "r", encoding="utf-8") as f:
-            data = json.load(f)
-            return {"email": data.get("email"), "password": data.get("password")}
-    return {"email": "", "password": ""}
+def get_smtp(db: Session = Depends(get_db)):
+    try:
+        smtp_config = db.execute(text("SELECT * FROM smtp_config ORDER BY id DESC LIMIT 1")).fetchone()
+        if smtp_config:
+            return {
+                "email": smtp_config.email,
+                "password": smtp_config.password,
+                "server": smtp_config.server,
+                "port": smtp_config.port
+            }
+        return {"email": "", "password": "", "server": "smtp.gmail.com", "port": 587}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Erreur lors de la récupération SMTP: {e}")
 
 # ------------------- POST SMTP -------------------
 @router.post("/settings/smtp")
-def save_smtp(settings: SMTPSettings):
+def save_smtp(settings: SMTPSettings, db: Session = Depends(get_db)):
     try:
-        with open(SMTP_FILE, "w", encoding="utf-8") as f:
-            json.dump({"email": settings.email, "password": settings.password}, f)
-        return {"success": True}
+        # Fafao taloha raha misy
+        db.execute(text("DELETE FROM smtp_config"))
+        # Ampidiro vaovao
+        db.execute(
+            text("""
+                INSERT INTO smtp_config (email, password, server, port) 
+                VALUES (:email, :password, :server, :port)
+            """),
+            {
+                "email": settings.email,
+                "password": settings.password,
+                "server": "smtp.gmail.com",
+                "port": 587
+            }
+        )
+        db.commit()
+        return {"success": True, "message": "SMTP settings saved in DB!"}
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Erreur lors de l'enregistrement SMTP: {e}")
 
-# ------------------- GET candidatures (inchangé) -------------------
+# ------------------- GET candidatures -------------------
 @router.get("/candidatures")
 async def get_candidatures():
     try:
@@ -65,14 +86,14 @@ async def send_invitation(id: int, db: Session = Depends(get_db)):
         if not candidature.email:
             raise HTTPException(status_code=400, detail="Email du candidat manquant")
 
-        # Charger SMTP dynamique
-        if os.path.exists(SMTP_FILE):
-            with open(SMTP_FILE, "r", encoding="utf-8") as f:
-                smtp_data = json.load(f)
-            smtp_email = smtp_data.get("email")
-            smtp_password = smtp_data.get("password")
-        else:
+        # Charger SMTP depuis DB
+        smtp_config = db.execute(text("SELECT * FROM smtp_config ORDER BY id DESC LIMIT 1")).fetchone()
+        if not smtp_config:
             raise HTTPException(status_code=500, detail="SMTP non configuré")
+        smtp_email = smtp_config.email
+        smtp_password = smtp_config.password
+        smtp_server = smtp_config.server or "smtp.gmail.com"
+        smtp_port = int(smtp_config.port or 587)
 
         # Générer PDF
         now = datetime.now()
@@ -116,7 +137,7 @@ async def send_invitation(id: int, db: Session = Depends(get_db)):
 
         # Envoyer mail
         try:
-            with smtplib.SMTP("smtp.gmail.com", 587) as server:
+            with smtplib.SMTP(smtp_server, smtp_port) as server:
                 server.starttls()
                 server.login(smtp_email, smtp_password)
                 server.sendmail(smtp_email, candidature.email, message.as_string())

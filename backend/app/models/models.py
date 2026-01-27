@@ -4,6 +4,31 @@ from app.db import Base
 from datetime import date
 
 
+
+# class Candidature(Base):
+#     __tablename__ = "candidatures"
+#     __table_args__ = {"extend_existing": True}
+
+#     id = Column(Integer, primary_key=True, index=True)
+#     fullname = Column(String(255), nullable=False)
+#     email = Column(String(255), nullable=False)
+#     telephone = Column("telephone", String(50), nullable=True)
+#     source = Column(String(100), nullable=True)
+#     raw_cv_s3 = Column(Text, nullable=True)
+#     parsed_json = Column(JSON, nullable=True)
+#     score = Column(Float, nullable=True)
+#     statut = Column(String(50), default="nouveau")
+#     poste = Column(String(100), nullable=True)
+
+#     offre_id = Column(Integer, ForeignKey("offres.id", ondelete="CASCADE"), nullable=False)
+
+#     offre = relationship("Offre", back_populates="candidatures")
+#     convocations = relationship(
+#         "Convocation",
+#         back_populates="candidature",
+#         cascade="all, delete-orphan"
+#     )
+#     employee = relationship("Employee", back_populates="candidature", uselist=False)
 class Candidature(Base):
     __tablename__ = "candidatures"
     __table_args__ = {"extend_existing": True}
@@ -11,7 +36,7 @@ class Candidature(Base):
     id = Column(Integer, primary_key=True, index=True)
     fullname = Column(String(255), nullable=False)
     email = Column(String(255), nullable=False)
-    phone = Column(String(50), nullable=True)
+    telephone = Column("telephone", String(50), nullable=True)
     source = Column(String(100), nullable=True)
     raw_cv_s3 = Column(Text, nullable=True)
     parsed_json = Column(JSON, nullable=True)
@@ -21,7 +46,20 @@ class Candidature(Base):
 
     offre_id = Column(Integer, ForeignKey("offres.id", ondelete="CASCADE"), nullable=False)
 
+    # Relation vers l'offre
     offre = relationship("Offre", back_populates="candidatures")
+
+    # 🔹 Property virtoaly ho an'ny ref_offre
+    @property
+    def ref_offre(self):
+        if self.offre_id and self.offre and hasattr(self.offre, "job_ref"):
+            return self.offre.job_ref
+        elif self.offre_id:
+            return f"offre_{self.offre_id}"
+        else:
+            return "UNASSIGNED"
+
+    # Relations
     convocations = relationship(
         "Convocation",
         back_populates="candidature",
@@ -162,6 +200,17 @@ class Pointage(Base):
     heure_entree = Column(Time)
     heure_sortie = Column(Time)
     mode = Column(String, default="manuel")
+
+
+
+class SMTPConfig(Base):
+    __tablename__ = "smtp_config"
+
+    id = Column(Integer, primary_key=True, index=True)
+    email = Column(String, nullable=False)
+    password = Column(String, nullable=False)
+    server = Column(String, default="smtp.gmail.com")
+    port = Column(Integer, default=587)
 
 
 __all__ = [

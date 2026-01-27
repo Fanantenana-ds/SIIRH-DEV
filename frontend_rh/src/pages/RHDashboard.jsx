@@ -347,7 +347,7 @@ const RHDashboard = () => {
                       {view !== "employees" && (
                         <td>
                           {view === "convoque"
-                            ? `${c.date_entretien || "Acune"} ${c.heure_entretien || ""}`
+                            ? `${c.date_entretien} ${c.heure_entretien}`
                             : `${c.date_candidature ? new Date(c.date_candidature).toLocaleDateString() : "—"}`} 
                         </td>
                       )}

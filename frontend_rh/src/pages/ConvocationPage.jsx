@@ -1,21 +1,3 @@
-// import React from "react";
-// import ConvocationForm from "../components/ConvocationForm";
-
-// function ConvocationPage() {
-//   // ohatra fotsiny: 11 = ID du candidat
-//   const candidatId = 11;
-
-//   return (
-//     <div style={{ marginTop: "50px" }}>
-//       <ConvocationForm candidatId={candidatId} />
-//     </div>
-//   );
-// }
-
-// export default ConvocationPage;
-
-
-
 import React from "react";
 import ConvocationForm from "../components/ConvocationForm";
 

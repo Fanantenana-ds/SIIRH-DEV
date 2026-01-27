@@ -3,6 +3,8 @@ from fastapi import APIRouter, HTTPException, Depends
 from sqlalchemy.orm import Session
 from app.db import get_db
 from app.models.models import Candidature, Employee
+from app.schemas.employees import Employee as EmployeeSchema
+
 
 router = APIRouter(tags=["Employees"])
 
@@ -21,7 +23,7 @@ def create_employee_from_candidature(candidature_id: int, db: Session = Depends(
     new_employee = Employee(
         fullname=candidature.fullname or "Nom Inconnu",
         email=candidature.email or "",
-        phone=candidature.phone or "",
+        phone=candidature.phone or "Aucune",
         poste=candidature.poste or "",
         candidature_id=candidature.id
     )
@@ -50,15 +52,15 @@ def list_employees(db: Session = Depends(get_db)):
             nom = parts[0]
             prenom = parts[1] if len(parts) > 1 else ""
 
-        result.append({
-            "id": e.id,
-            "nom": nom or "Inconnu",
-            "prenom": prenom or "Inconnu",
-            "poste": e.poste if e.poste else "Non défini",
-            "email": e.email if e.email else "—",
-            "phone": e.phone if e.phone else "Aucune",
-            "candidature_id": e.candidature_id
-        })
+        result.append(EmployeeSchema(
+            id=e.id,
+            nom=nom or "Inconnu",
+            prenom=prenom or "Inconnu",
+            email=e.email or "",
+            poste=e.poste or "",
+            phone = e.phone if e.phone else (e.candidature.telephone if e.candidature else "Aucune"),
+            candidature_id=e.candidature_id
+        ))
 
     return result
 
