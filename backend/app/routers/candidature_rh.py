@@ -1070,16 +1070,17 @@
 
 
 
-
-
 from fastapi import APIRouter, HTTPException, Depends
 from sqlalchemy.orm import Session
 from app.db import get_db, engine
 from app.models.models import Candidature, Convocation
 from app.utils.pdf_generator import generate_convocation_pdf
+from app.services import scoring_auto
 from datetime import datetime
+from PyPDF2 import PdfReader
 import sqlalchemy
 from sqlalchemy import text
+import json
 import os
 import logging
 import smtplib
@@ -1087,31 +1088,22 @@ from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from email.mime.base import MIMEBase
 from email import encoders
-import json
 import traceback
 
 router = APIRouter()
-logger = logging.getLogger(__name__)
-logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger("app")
+logger.setLevel(logging.INFO)
+handler = logging.StreamHandler()
+formatter = logging.Formatter("%(asctime)s [%(levelname)s] %(message)s")
+handler.setFormatter(formatter)
+logger.addHandler(handler)
 
 # ==========================================================
-# 🔹 GET candidatures avec scoring automatique précis
+# 🔹 GET candidatures avec scoring automatique
 # ==========================================================
 @router.get("/candidatures")
-async def get_candidatures():
-    import os, json, traceback
-    from datetime import datetime
-    from fastapi import HTTPException
-    from sqlalchemy.orm import Session
-    from app.db import get_db
-    from app.models import Candidature
-    from app.services import scoring_auto  # <- scoring_auto.py
-    from PyPDF2 import PdfReader
-
+def get_candidatures(db: Session = Depends(get_db)):
     try:
-        db: Session = next(get_db())
-
-        # Récupérer toutes les candidatures
         candidatures_db = db.query(Candidature).order_by(Candidature.id.desc()).all()
         candidatures = []
         nouvelles_candidates = []
@@ -1121,21 +1113,22 @@ async def get_candidatures():
                 "id": candidat.id,
                 "fullname": candidat.fullname,
                 "email": candidat.email,
-                "phone": candidat.telephone,
+                "phone": getattr(candidat, "telephone", None),
                 "poste": candidat.poste,
                 "statut": candidat.statut,
-                "score": candidat.score,        # score déjà existant
-                "score_total": candidat.score,  # idem
-                "offre_id": candidat.offre_id,
-                "ref_offre": candidat.ref_offre,
-                "source": candidat.source,
-                "raw_cv_s3": candidat.raw_cv_s3,
-                "parsed_json": candidat.parsed_json,
+                "score": float(candidat.score) if candidat.score is not None else 0,
+                "score_total": float(candidat.score_total) if getattr(candidat, "score_total", None) is not None else 0,
+                "score_breakdown": getattr(candidat, "score_breakdown", {}) or {},
+                "offre_id": getattr(candidat, "offre_id", None),
+                "ref_offre": getattr(candidat, "ref_offre", None),
+                "source": getattr(candidat, "source", None),
+                "raw_cv_s3": getattr(candidat, "raw_cv_s3", None),
+                "parsed_json": getattr(candidat, "parsed_json", None),
                 "date": datetime.now().isoformat(),
                 "date_candidature": datetime.now().isoformat(),
             }
 
-            # ---------- NOM / PRENOM ----------
+            # Nom / Prénom
             if candidat.fullname:
                 parts = candidat.fullname.split()
                 if len(parts) >= 2:
@@ -1148,7 +1141,7 @@ async def get_candidatures():
                 r["nom"] = ""
                 r["prenom"] = ""
 
-            # ---------- Candidatures sans parsed_json ----------
+            # Candidatures sans parsed_json
             if not candidat.parsed_json:
                 nouvelles_candidates.append(r)
 
@@ -1178,44 +1171,37 @@ async def get_candidatures():
                     parsed_cv = parse_cv_text(texte_cv)
 
                     # Mise à jour parsed_json DB
-                    update_parsed = f"UPDATE candidatures SET parsed_json=:parsed WHERE id=:id"
                     db.execute(
-                        update_parsed,
+                        text("UPDATE candidatures SET parsed_json=:parsed WHERE id=:id"),
                         {"parsed": json.dumps(parsed_cv, ensure_ascii=False), "id": r["id"]}
                     )
+                    db.commit()
 
-                    # ---------- Score automatique ----------
-                    # Récupérer l'offre correspondante (ici simplifié)
-                    offre_dict = json.loads(candidat.offre.scoring_criteres) if candidat.offre and candidat.offre.scoring_criteres else {}
+                    # Score automatique
+                    cand_db = db.query(Candidature).filter(Candidature.id == r["id"]).first()
+                    offre_dict = json.loads(cand_db.offre.scoring_criteres) if cand_db.offre and cand_db.offre.scoring_criteres else {}
                     score_result = scoring_auto.calculer_score_auto(texte_cv, offre_dict)
 
-                    score_total = score_result["score"]
+                    score_total = score_result.get("score", 0)
                     breakdown = score_result
 
                     # Mise à jour score DB
-                    update_score = f"""
-                        UPDATE candidatures
-                        SET score_total=:score, score_breakdown=:breakdown
-                        WHERE id=:id
-                    """
                     db.execute(
-                        update_score,
+                        text("UPDATE candidatures SET score_total=:score, score_breakdown=:breakdown WHERE id=:id"),
                         {"score": score_total, "breakdown": json.dumps(breakdown, ensure_ascii=False), "id": r["id"]}
                     )
+                    db.commit()
+                    db.refresh(cand_db)
 
                 except Exception as e:
-                    print(f"⚠️ Erreur parsing/scoring: {e}")
-                    parsed_cv = {}
-                    score_total = r.get("score") or 0
-                    breakdown = {}
+                    logger.error(f"⚠️ Erreur parsing/scoring: {e}\n{traceback.format_exc()}")
 
-            # ---------- Update retour ----------
             r["parsed_json"] = parsed_cv
             r["score_total"] = score_total
             r["score_breakdown"] = breakdown
             r["score"] = score_total
 
-        # ---------- Sécurité anciennes candidatures ----------
+        # Sécurité anciennes candidatures
         for r in candidatures:
             if "score_total" not in r or r["score_total"] is None:
                 r["score_total"] = r.get("score") or 0
@@ -1223,82 +1209,14 @@ async def get_candidatures():
                 r["score_breakdown"] = {}
             r["score"] = r["score_total"]
 
-        # ---------- Classement ----------
+        # Classement
         candidatures.sort(key=lambda x: x.get("score_total", 0), reverse=True)
 
-        return candidatures
-
-    except Exception as e:
-        print(traceback.format_exc())
-        raise HTTPException(status_code=500, detail=f"Erreur interne : {e}")
-
-# ==========================================================
-# 🔹 GET candidatures (SIMPLE / FRONTEND)
-# ==========================================================
-from fastapi import Depends, HTTPException
-from sqlalchemy.orm import Session
-from datetime import datetime
-import traceback
-from app.db import get_db
-from app.models import Candidature
-import logging
-
-logger = logging.getLogger("app")
-logger.setLevel(logging.INFO)
-handler = logging.StreamHandler()
-formatter = logging.Formatter("%(asctime)s [%(levelname)s] %(message)s")
-handler.setFormatter(formatter)
-logger.addHandler(handler)
-
-@router.get("/candidatures")
-def get_candidatures(db: Session = Depends(get_db)):
-    try:
-        candidatures_db = db.query(Candidature).order_by(Candidature.id.desc()).all()
-        
-        candidatures = []
-        for candidat in candidatures_db:
-            r = {
-                "id": candidat.id,
-                "fullname": candidat.fullname,
-                "email": candidat.email,
-                "phone": getattr(candidat, "telephone", None),      # fallback
-                "poste": candidat.poste,
-                "statut": candidat.statut,
-                "score": float(candidat.score) if candidat.score is not None else 10.0,
-                "score_total": float(candidat.score) if candidat.score is not None else 10.0,
-                "offre_id": getattr(candidat, "offre_id", None),
-                "ref_offre": getattr(candidat, "offre_id", None),
-                "source": getattr(candidat, "source", None),
-                "raw_cv_s3": getattr(candidat, "raw_cv_s3", None),
-                "parsed_json": getattr(candidat, "parsed_json", None),
-                "date": datetime.now().isoformat(),
-                "date_candidature": datetime.now().isoformat(),
-            }
-
-            # Nom / Prénom
-            if candidat.fullname:
-                parts = candidat.fullname.split()
-                if len(parts) >= 2:
-                    r["nom"] = parts[0]
-                    r["prenom"] = " ".join(parts[1:])
-                else:
-                    r["nom"] = candidat.fullname
-                    r["prenom"] = ""
-            else:
-                r["nom"] = ""
-                r["prenom"] = ""
-            
-            candidatures.append(r)
-        
-        # Trier par score_total
-        candidatures.sort(key=lambda x: x.get("score_total", 0), reverse=True)
-        
         logger.info(f"✅ {len(candidatures)} candidatures récupérées")
         return candidatures
 
     except Exception as e:
-        logger.error(f"❌ Erreur get_candidatures: {e}")
-        print(traceback.format_exc())
+        logger.error(f"❌ Erreur get_candidatures: {e}\n{traceback.format_exc()}")
         raise HTTPException(status_code=500, detail=f"Erreur interne : {e}")
 
 # ==========================================================
@@ -1307,27 +1225,27 @@ def get_candidatures(db: Session = Depends(get_db)):
 @router.put("/candidatures/{id}/select")
 async def select_candidature(id: int):
     try:
-        query = sqlalchemy.text("UPDATE candidatures SET statut='Sélectionné' WHERE id=:id")
+        query = text("UPDATE candidatures SET statut='Sélectionné' WHERE id=:id")
         with engine.begin() as conn:
             res = conn.execute(query, {"id": id})
             if res.rowcount == 0:
                 raise HTTPException(status_code=404, detail="Candidature non trouvée")
         return {"message": "Candidature sélectionnée avec succès"}
     except Exception as e:
-        print(traceback.format_exc())
+        logger.error(traceback.format_exc())
         raise HTTPException(status_code=500, detail=f"Erreur : {e}")
 
 @router.put("/candidatures/{id}/deselect")
 async def deselect_candidature(id: int):
     try:
-        query = sqlalchemy.text("UPDATE candidatures SET statut='Désélectionné' WHERE id=:id")
+        query = text("UPDATE candidatures SET statut='Désélectionné' WHERE id=:id")
         with engine.begin() as conn:
             res = conn.execute(query, {"id": id})
             if res.rowcount == 0:
                 raise HTTPException(status_code=404, detail="Candidature non trouvée")
         return {"message": "Candidature désélectionnée avec succès"}
     except Exception as e:
-        print(traceback.format_exc())
+        logger.error(traceback.format_exc())
         raise HTTPException(status_code=500, detail=f"Erreur : {e}")
 
 # ==========================================================
@@ -1336,7 +1254,6 @@ async def deselect_candidature(id: int):
 @router.post("/candidatures/{id}/send-invitation")
 async def send_invitation(id: int, db: Session = Depends(get_db)):
     try:
-        # --- Vérification candidat ---
         candidature = db.query(Candidature).filter(Candidature.id == id).first()
         if not candidature:
             raise HTTPException(status_code=404, detail="Candidature non trouvée")
@@ -1345,7 +1262,6 @@ async def send_invitation(id: int, db: Session = Depends(get_db)):
         if candidature.statut != "Sélectionné":
             raise HTTPException(status_code=400, detail="Seul les candidats sélectionnés peuvent recevoir une convocation")
 
-        # --- Création convocation si pas encore existante ---
         now = datetime.now()
         convocation = Convocation(
             candidature_id=candidature.id,
@@ -1358,22 +1274,18 @@ async def send_invitation(id: int, db: Session = Depends(get_db)):
         db.commit()
         db.refresh(convocation)
 
-        # --- Génération PDF ---
         pdf_path = generate_convocation_pdf(candidature, convocation)
         logger.info(f"✅ Convocation PDF généré : {pdf_path}")
 
-        # --- Récupération SMTP depuis DB ---
         smtp_config = db.execute(text("SELECT * FROM smtp_config ORDER BY id DESC LIMIT 1")).fetchone()
         if not smtp_config:
-            logger.error("❌ SMTP config non trouvée dans la DB")
             raise HTTPException(status_code=500, detail="SMTP config tsy hita")
 
         sender_email = smtp_config.email
         sender_password = smtp_config.password
         smtp_server = smtp_config.server or "smtp.gmail.com"
         smtp_port = int(smtp_config.port or 587)
-        
-        # --- Préparation email ---
+
         message = MIMEMultipart()
         message["Subject"] = "Convocation entretien - CODEL"
         message["From"] = sender_email
@@ -1398,15 +1310,11 @@ async def send_invitation(id: int, db: Session = Depends(get_db)):
             part = MIMEBase("application", "octet-stream")
             part.set_payload(f.read())
             encoders.encode_base64(part)
-            part.add_header(
-                "Content-Disposition",
-                f'attachment; filename="{os.path.basename(pdf_path)}"'
-            )
+            part.add_header("Content-Disposition", f'attachment; filename="{os.path.basename(pdf_path)}"')
             message.attach(part)
 
-        # --- Envoi email via SMTP DB ---
         try:
-            with smtplib.SMTP(smtp_server, int(smtp_port)) as server:
+            with smtplib.SMTP(smtp_server, smtp_port) as server:
                 server.starttls()
                 server.login(sender_email, sender_password)
                 server.sendmail(sender_email, candidature.email, message.as_string())
@@ -1415,7 +1323,6 @@ async def send_invitation(id: int, db: Session = Depends(get_db)):
             logger.error(f"❌ Erreur SMTP : {str(e)}")
             raise HTTPException(status_code=500, detail=f"Erreur lors de l'envoi du mail : {str(e)}")
 
-        # --- Mise à jour statut ---
         convocation.status = "envoyée"
         convocation.lien_fichier = pdf_path
         candidature.statut = "Convoqué"
@@ -1440,7 +1347,7 @@ async def send_invitation(id: int, db: Session = Depends(get_db)):
 @router.post("/employes/from-candidature/{id}")
 async def add_employee_from_candidature(id: int):
     try:
-        query = sqlalchemy.text("SELECT * FROM candidatures WHERE id=:id")
+        query = text("SELECT * FROM candidatures WHERE id=:id")
         with engine.begin() as conn:
             result = conn.execute(query, {"id": id})
             cand = result.fetchone()
@@ -1451,7 +1358,7 @@ async def add_employee_from_candidature(id: int):
             nom = cand_dict.get("nom") or "Employé"
             prenom = cand_dict.get("prenom") or "Inconnu"
 
-            insert_query = sqlalchemy.text("""
+            insert_query = text("""
                 INSERT INTO employes (nom, prenom, email, tel, poste, candidature_id, date_embauche)
                 VALUES (:nom, :prenom, :email, :tel, :poste, :candidature_id, NOW())
             """)
@@ -1464,11 +1371,10 @@ async def add_employee_from_candidature(id: int):
                 "candidature_id": cand_dict["id"]
             })
 
-            update_query = sqlalchemy.text("UPDATE candidatures SET statut='Employé' WHERE id=:id")
+            update_query = text("UPDATE candidatures SET statut='Employé' WHERE id=:id")
             conn.execute(update_query, {"id": id})
 
         return {"message": f"Candidat {nom} {prenom} ajouté comme employé avec succès"}
     except Exception as e:
-        print(traceback.format_exc())
+        logger.error(traceback.format_exc())
         raise HTTPException(status_code=500, detail=f"Erreur : {e}")
-    
