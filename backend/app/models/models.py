@@ -29,6 +29,7 @@ from datetime import date
 #         cascade="all, delete-orphan"
 #     )
 #     employee = relationship("Employee", back_populates="candidature", uselist=False)
+
 class Candidature(Base):
     __tablename__ = "candidatures"
     __table_args__ = {"extend_existing": True}
@@ -36,20 +37,22 @@ class Candidature(Base):
     id = Column(Integer, primary_key=True, index=True)
     fullname = Column(String(255), nullable=False)
     email = Column(String(255), nullable=False)
-    telephone = Column("telephone", String(50), nullable=True)
+    telephone = Column(String(50), nullable=True)
     source = Column(String(100), nullable=True)
     raw_cv_s3 = Column(Text, nullable=True)
     parsed_json = Column(JSON, nullable=True)
     score = Column(Float, nullable=True)
+    score_total = Column(Float, default=0)             # ✅ Ajouter ity
+    score_breakdown = Column(JSON, default={})         # ✅ Ajouter ity
     statut = Column(String(50), default="nouveau")
     poste = Column(String(100), nullable=True)
-
     offre_id = Column(Integer, ForeignKey("offres.id", ondelete="CASCADE"), nullable=False)
 
-    # Relation vers l'offre
+    # Relations
     offre = relationship("Offre", back_populates="candidatures")
+    convocations = relationship("Convocation", back_populates="candidature", cascade="all, delete-orphan")
+    employee = relationship("Employee", back_populates="candidature", uselist=False)
 
-    # 🔹 Property virtoaly ho an'ny ref_offre
     @property
     def ref_offre(self):
         if self.offre_id and self.offre and hasattr(self.offre, "job_ref"):
@@ -58,15 +61,6 @@ class Candidature(Base):
             return f"offre_{self.offre_id}"
         else:
             return "UNASSIGNED"
-
-    # Relations
-    convocations = relationship(
-        "Convocation",
-        back_populates="candidature",
-        cascade="all, delete-orphan"
-    )
-    employee = relationship("Employee", back_populates="candidature", uselist=False)
-
 
 class Employee(Base):
     __tablename__ = "employees"
