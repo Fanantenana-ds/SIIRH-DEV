@@ -213,6 +213,44 @@
 #     except:
 #         return str(header) if header else ""
 
+
+# ##========= ENLEVE LES EMONJIS DANS LE NOM
+# def get_candidatures_rh():
+#     with engine.connect() as conn:
+#         query = text("""
+#             SELECT 
+#                 id,
+#                 -- Nettoyer les noms (enlever emojis)
+#                 TRIM(REGEXP_REPLACE(nom, '[^a-zA-ZÀ-ÿ\- ]', '', 'g')) as nom_clean,
+#                 TRIM(REGEXP_REPLACE(prenom, '[^a-zA-ZÀ-ÿ\- ]', '', 'g')) as prenom_clean,
+#                 poste,
+#                 date_candidature,
+#                 score_total,
+#                 statut,
+#                 cv_text
+#             FROM candidatures
+#             ORDER BY date_candidature DESC
+#         """)
+        
+#         result = conn.execute(query).mappings().all()
+        
+#         # Formater pour le frontend
+#         formatted = []
+#         for row in result:
+#             formatted.append({
+#                 "id": row["id"],
+#                 "nom": row["nom_clean"] or "Non spécifié",
+#                 "prenom": row["prenom_clean"] or "",
+#                 "nom_complet": f"{row['nom_clean'] or ''} {row['prenom_clean'] or ''}".strip(),
+#                 "poste": row["poste"] or "Non spécifié",
+#                 "date": row["date_candidature"].strftime("%d/%m/%Y") if row["date_candidature"] else "",
+#                 "score": row["score_total"] or 0,
+#                 "statut": row["statut"] or "Nouveau",
+#                 "has_cv": bool(row["cv_text"] and len(row["cv_text"].strip()) > 0)
+#             })
+        
+#         return formatted
+
 # def is_cv_email(msg: email.message.Message) -> bool:
 #     """Vérifier si l'email contient un CV"""
 #     cv_extensions = ['.pdf', '.doc', '.docx', '.odt', '.rtf']
@@ -451,7 +489,7 @@
 #                         ref = extract_offre_ref(filename)
 #                         if ref:
 #                             offre_ref = ref
-#                             logger.info(f"📁 Référence dans fichier: {offre_ref}")
+#                             logger.info(f"📁 Référence dans fichier: {ref}")
 #                             break
                 
 #                 # TROUVER L'OFFRE
@@ -475,30 +513,45 @@
 #                     emails_ignores += 1
 #                     continue
                 
-#                 # CRÉATION CANDIDATURE
-#                 candidature_data = {
-#                     "fullname": from_name,
-#                     "email": from_email,
-#                     "statut": "Nouveau",
-#                     "source": "Email automatique",
-#                     "ref_offre": offre_ref,
-#                 }
-                
+#                 # CRÉATION CANDIDATURE - FANITSIANA LEHIBE ETO
+#                 # Préparer données selon colonnes EXISTANTES dans la table
 #                 if offre_trouvee:
-#                     candidature_data["poste"] = offre_trouvee.title
-#                     candidature_data["offre_id"] = offre_trouvee.id
-#                     logger.info(f"📌 Liée à offre: {offre_trouvee.title}")
+#                     poste = offre_trouvee.title[:100]  # 100 chars max selon table
+#                     offre_id = offre_trouvee.id
 #                 else:
-#                     # Offre par défaut
+#                     # Offre par défaut obligatoire car offre_id est NOT NULL
 #                     offre_defaut = offres[0] if offres else None
 #                     if offre_defaut:
-#                         candidature_data["poste"] = offre_defaut.title
-#                         candidature_data["offre_id"] = offre_defaut.id
+#                         poste = offre_defaut.title[:100]
+#                         offre_id = offre_defaut.id
 #                         logger.info(f"📌 Assignée à offre par défaut: {offre_defaut.job_ref}")
 #                     else:
-#                         candidature_data["poste"] = "Poste non spécifié"
-#                         candidature_data["offre_id"] = None
-#                         logger.warning("⚠️ Aucune offre disponible")
+#                         poste = "Non spécifié"[:100]
+#                         offre_id = 1  # Valeur par défaut obligatoire
+#                         logger.warning(f"⚠️ Aucune offre disponible, utilisation ID=1")
+                
+#                 # Données CANDIDATURE selon structure EXACTE de la table
+#                 # Ne pas inclure 'competences' car pas dans la table
+#                 candidature_data = {
+#                     "fullname": from_name[:255],
+#                     "email": from_email[:255],
+#                     "telephone": None,
+#                     "poste": poste,
+#                     "offre_id": offre_id,  # OBLIGATOIRE, NOT NULL dans table
+#                     "ref_offre": offre_ref[:100],
+#                     "date_candidature": datetime.now(),
+#                     "statut": "Nouveau",
+#                     "source": "Email automatique"[:255],
+#                     # Colonnes supplémentaires qui EXISTENT dans la table
+#                     "score": None,
+#                     "score_total": 0.0,
+#                     "score_breakdown": {},
+#                     "cv_text": None,
+#                     "experience_years": 0,
+#                     "date_maj": datetime.now(),
+#                     "raw_cv_s3": None,
+#                     # NE PAS INCLURE 'competences' - pas dans table
+#                 }
                 
 #                 try:
 #                     candidature = Candidature(**candidature_data)
@@ -509,7 +562,7 @@
 #                     logger.info(f"✅ Candidature créée ID {candidature.id}")
 #                     logger.info(f"   👤 Nom: {from_name}")
 #                     logger.info(f"   📧 Email: {from_email}")
-#                     logger.info(f"   🎯 Offre: {candidature_data['poste']}")
+#                     logger.info(f"   🎯 Offre: {poste}")
                     
 #                 except Exception as e:
 #                     logger.error(f"❌ Erreur création candidature: {e}")
@@ -680,7 +733,11 @@
 #         return {"status": "error", "message": "Aucune config SMTP en DB"}
 
 
-# app/routers/mail_listener.py - VERSION AVEC CONFIGURATION DB
+
+
+
+
+# app/routers/mail_listener.py - VERSION CORRIGÉE
 from fastapi import APIRouter, HTTPException, Depends
 from fastapi_utils.tasks import repeat_every
 from sqlalchemy.orm import Session
@@ -1006,14 +1063,14 @@ def get_email_attachments(msg: email.message.Message) -> List[tuple]:
     
     return attachments
 
-# ================= FONCTION PRINCIPALE =================
+# ================= FONCTION PRINCIPALE CORRIGÉE =================
 
 is_processing = False
 
 @router.on_event("startup")
 @repeat_every(seconds=MAIL_CHECK_INTERVAL, wait_first=True)
 def check_new_mails():
-    """Fonction principale de vérification des nouveaux emails"""
+    """Fonction principale de vérification des nouveaux emails - VERSION CORRIGÉE"""
     global is_processing
     
     if is_processing:
@@ -1023,7 +1080,9 @@ def check_new_mails():
     is_processing = True
     logger.info("🔍 Début vérification emails...")
     
-    db: Session = next(get_db())
+    # Créer une session DB indépendante pour éviter les problèmes de session
+    SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+    db = SessionLocal()
     
     try:
         # 1. Charger configuration SMTP DEPUIS DB
@@ -1047,6 +1106,7 @@ def check_new_mails():
         except Exception as e:
             logger.error(f"❌ Erreur connexion IMAP: {e}")
             is_processing = False
+            db.close()
             return
         
         # 3. Chercher emails non lus
@@ -1056,6 +1116,7 @@ def check_new_mails():
                 logger.info("📭 Aucun email non lu")
                 mail.logout()
                 is_processing = False
+                db.close()
                 return
             
             email_ids = messages[0].split()
@@ -1064,18 +1125,30 @@ def check_new_mails():
             logger.error(f"❌ Erreur recherche emails: {e}")
             mail.logout()
             is_processing = False
+            db.close()
             return
         
         # 4. Charger offres disponibles
         offres = db.query(Offre).all()
         logger.info(f"📋 {len(offres)} offres disponibles en base")
         
-        # 5. Traiter chaque email
+        # 5. Obtenir le prochain ID de séquence AVANT la boucle
+        try:
+            sequence_query = text("SELECT nextval('candidatures_id_seq') as next_id")
+            next_id_result = db.execute(sequence_query).fetchone()
+            base_id = next_id_result.next_id if next_id_result else None
+            logger.info(f"🔢 Prochain ID disponible: {base_id}")
+        except Exception as e:
+            logger.warning(f"⚠️ Impossible d'obtenir le séquence ID: {e}")
+            base_id = None
+        
+        # 6. Traiter chaque email
         emails_traites = 0
         emails_ignores = 0
         
-        for email_id in email_ids:
+        for idx, email_id in enumerate(email_ids):
             email_id_str = email_id.decode('utf-8')
+            current_candidate_id = base_id + idx if base_id else None
             
             try:
                 logger.info(f"\n{'='*60}")
@@ -1148,20 +1221,17 @@ def check_new_mails():
                 else:
                     logger.warning("⚠️ Aucune référence d'offre")
                 
-                # DÉCISION
+                # DÉCISION - Même sans référence exacte, on continue
                 if not offre_ref:
-                    logger.error("❌ Pas de référence - email ignoré")
-                    mail.store(email_id, "+FLAGS", "\\Seen")
-                    emails_ignores += 1
-                    continue
+                    logger.info("ℹ️ Pas de référence exacte, utilisation référence générique")
+                    offre_ref = "EMAIL_" + datetime.now().strftime("%Y%m%d_%H%M%S")
                 
-                # CRÉATION CANDIDATURE - FANITSIANA LEHIBE ETO
-                # Préparer données selon colonnes EXISTANTES dans la table
+                # CRÉATION CANDIDATURE - VERSION CORRIGÉE AVEC INSERT DIRECT SQL
                 if offre_trouvee:
-                    poste = offre_trouvee.title[:100]  # 100 chars max selon table
+                    poste = offre_trouvee.title[:100]
                     offre_id = offre_trouvee.id
                 else:
-                    # Offre par défaut obligatoire car offre_id est NOT NULL
+                    # Offre par défaut
                     offre_defaut = offres[0] if offres else None
                     if offre_defaut:
                         poste = offre_defaut.title[:100]
@@ -1169,104 +1239,132 @@ def check_new_mails():
                         logger.info(f"📌 Assignée à offre par défaut: {offre_defaut.job_ref}")
                     else:
                         poste = "Non spécifié"[:100]
-                        offre_id = 1  # Valeur par défaut obligatoire
+                        offre_id = 1
                         logger.warning(f"⚠️ Aucune offre disponible, utilisation ID=1")
                 
-                # Données CANDIDATURE selon structure EXACTE de la table
-                # Ne pas inclure 'competences' car pas dans la table
-                candidature_data = {
-                    "fullname": from_name[:255],
-                    "email": from_email[:255],
-                    "telephone": None,
-                    "poste": poste,
-                    "offre_id": offre_id,  # OBLIGATOIRE, NOT NULL dans table
-                    "ref_offre": offre_ref[:100],
-                    "date_candidature": datetime.now(),
-                    "statut": "Nouveau",
-                    "source": "Email automatique"[:255],
-                    # Colonnes supplémentaires qui EXISTENT dans la table
-                    "score": None,
-                    "score_total": 0.0,
-                    "score_breakdown": {},
-                    "cv_text": None,
-                    "experience_years": 0,
-                    "date_maj": datetime.now(),
-                    "raw_cv_s3": None,
-                    # NE PAS INCLURE 'competences' - pas dans table
-                }
-                
+                # ========== CORRECTION PRINCIPALE ==========
+                # Utilisation d'INSERT SQL direct pour garantir un ID valide
                 try:
-                    candidature = Candidature(**candidature_data)
-                    db.add(candidature)
-                    db.commit()
-                    db.refresh(candidature)
+                    # Préparer les données pour l'insertion
+                    now = datetime.now()
                     
-                    logger.info(f"✅ Candidature créée ID {candidature.id}")
-                    logger.info(f"   👤 Nom: {from_name}")
-                    logger.info(f"   📧 Email: {from_email}")
-                    logger.info(f"   🎯 Offre: {poste}")
+                    # Déterminer l'ID - utiliser l'ID calculé ou laisser la base générer
+                    insert_data = {
+                        "fullname": from_name[:255],
+                        "email": from_email[:255],
+                        "phone": None,
+                        "poste": poste,
+                        "offre_id": offre_id,
+                        "ref_offre": offre_ref[:100],
+                        "date_candidature": now,
+                        "statut": "En attente",  # ⬅️ IMPORTANT: Utiliser "En attente" comme formulaire
+                        "source": "Email automatique"[:255],
+                        "score": 0,
+                        "score_total": 0.0,
+                        "score_breakdown": json.dumps({}),
+                        "cv_text": None,
+                        "experience_years": 0,
+                        "date_maj": now,
+                        "raw_cv_s3": None,
+                        "created_at": now
+                    }
                     
+                    # Insertion directe avec SQL
+                    columns = ", ".join(insert_data.keys())
+                    placeholders = ", ".join([f":{key}" for key in insert_data.keys()])
+                    insert_query = text(f"""
+                        INSERT INTO candidatures ({columns})
+                        VALUES ({placeholders})
+                        RETURNING id, fullname, email, statut
+                    """)
+                    
+                    result = db.execute(insert_query, insert_data)
+                    inserted_row = result.fetchone()
+                    
+                    if inserted_row:
+                        candidature_id = inserted_row[0]
+                        logger.info(f"✅ Candidature créée ID {candidature_id}")
+                        logger.info(f"   👤 Nom: {inserted_row[1]}")
+                        logger.info(f"   📧 Email: {inserted_row[2]}")
+                        logger.info(f"   📊 Statut: {inserted_row[3]}")
+                        logger.info(f"   🎯 Offre: {poste}")
+                        
+                        # Commit pour sauvegarder
+                        db.commit()
+                        
+                        # TRAITEMENT CV si disponible
+                        attachments = get_email_attachments(msg)
+                        
+                        if attachments:
+                            logger.info(f"📦 {len(attachments)} fichier(s) CV")
+                            
+                            filename, content = attachments[0]
+                            
+                            try:
+                                logger.info(f"   ⬆️  Upload {filename}...")
+                                result = process_cv_from_bytes(db, content, filename, candidature_id)
+                                
+                                if result and result.get("success"):
+                                    logger.info(f"   ✅ Upload réussi")
+                                    
+                                    if result.get('nlp_info'):
+                                        nlp_info = result['nlp_info']
+                                        
+                                        # Mettre à jour les infos extraites
+                                        update_data = {}
+                                        if nlp_info.get('fullname'):
+                                            update_data['fullname'] = nlp_info['fullname'][:255]
+                                            logger.info(f"   👤 Nom extrait: {nlp_info['fullname']}")
+                                        
+                                        if nlp_info.get('phone'):
+                                            update_data['phone'] = nlp_info['phone'][:50]
+                                            logger.info(f"   📞 Téléphone: {nlp_info['phone']}")
+                                        
+                                        if 'score' in nlp_info:
+                                            update_data['score'] = nlp_info['score']
+                                            update_data['score_total'] = float(nlp_info['score'])
+                                            logger.info(f"   🎯 Score: {nlp_info['score']}%")
+                                        
+                                        # Mettre à jour si nécessaire
+                                        if update_data:
+                                            update_query = text(f"""
+                                                UPDATE candidatures 
+                                                SET {', '.join([f"{k} = :{k}" for k in update_data.keys()])}
+                                                WHERE id = :id
+                                            """)
+                                            update_data['id'] = candidature_id
+                                            db.execute(update_query, update_data)
+                                            db.commit()
+                                            logger.info(f"   ✅ Candidature mise à jour avec infos NLP")
+                                    
+                                else:
+                                    error_msg = result.get('error', 'Erreur inconnue') if result else 'Pas de résultat'
+                                    logger.warning(f"   ⚠️ Échec upload CV: {error_msg}")
+                                    
+                            except Exception as e:
+                                logger.error(f"   ❌ Erreur traitement CV: {e}")
+                        else:
+                            logger.warning("⚠️ Aucun fichier CV attaché")
+                    
+                    else:
+                        logger.error("❌ Erreur: Pas d'ID retourné après insertion")
+                        continue
+                        
                 except Exception as e:
                     logger.error(f"❌ Erreur création candidature: {e}")
                     db.rollback()
                     mail.store(email_id, "+FLAGS", "\\Seen")
                     continue
-                
-                # TRAITEMENT CV
-                attachments = get_email_attachments(msg)
-                
-                if attachments:
-                    logger.info(f"📦 {len(attachments)} fichier(s) CV")
-                    
-                    filename, content = attachments[0]
-                    
-                    try:
-                        logger.info(f"   ⬆️  Upload {filename}...")
-                        result = process_cv_from_bytes(db, content, filename, candidature.id)
-                        
-                        if result and result.get("success"):
-                            logger.info(f"   ✅ Upload réussi")
-                            
-                            if result.get('nlp_info'):
-                                nlp_info = result['nlp_info']
-                                
-                                if nlp_info.get('fullname'):
-                                    nouveau_nom = nlp_info['fullname']
-                                    if nouveau_nom and nouveau_nom != from_name:
-                                        candidature.fullname = nouveau_nom
-                                        logger.info(f"   👤 Nom extrait: {nouveau_nom}")
-                                
-                                if nlp_info.get('phone'):
-                                    candidature.phone = nlp_info['phone']
-                                    logger.info(f"   📞 Téléphone: {nlp_info['phone']}")
-                                
-                                if 'score' in nlp_info:
-                                    candidature.score = nlp_info['score']
-                                    logger.info(f"   🎯 Score: {nlp_info['score']}%")
-                                
-                                db.commit()
-                                logger.info(f"   ✅ Candidature mise à jour")
-                            else:
-                                logger.warning(f"   ⚠️ Pas d'infos NLP")
-                        else:
-                            error_msg = result.get('error', 'Erreur inconnue') if result else 'Pas de résultat'
-                            logger.error(f"   ❌ Échec upload: {error_msg}")
-                            
-                    except Exception as e:
-                        logger.error(f"   ❌ Erreur traitement CV: {e}")
-                else:
-                    logger.warning("⚠️ Aucun fichier CV")
-                    db.delete(candidature)
-                    db.commit()
-                    logger.info("🗑️ Candidature supprimée")
+                # ========== FIN CORRECTION ==========
                 
                 # Marquer email comme lu
                 mail.store(email_id, "+FLAGS", "\\Seen")
                 emails_traites += 1
-                logger.info(f"📌 Email traité")
+                logger.info(f"📌 Email traité avec succès")
                 
             except Exception as e:
-                logger.error(f"💥 Erreur email {email_id_str}: {e}")
+                logger.error(f"💥 Erreur traitement email {email_id_str}: {e}")
+                logger.error(traceback.format_exc())
                 continue
         
         # Fermeture
@@ -1274,7 +1372,7 @@ def check_new_mails():
         
         logger.info(f"\n{'='*60}")
         logger.info("🎯 SYNTHÈSE")
-        logger.info(f"   📥 Total: {len(email_ids)}")
+        logger.info(f"   📥 Total emails: {len(email_ids)}")
         logger.info(f"   ✅ Traités: {emails_traites}")
         logger.info(f"   🚫 Ignorés: {emails_ignores}")
         

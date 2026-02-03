@@ -1,6 +1,8 @@
+# backend/app/utils/pdf_generator.py - VERSION CORRIGÉE
 from fpdf import FPDF
 from datetime import datetime
 import os
+import re
 
 # ==========================================================
 # Mapping mois en français
@@ -24,7 +26,59 @@ def date_fr(date_obj: datetime, lieu: str = "Antananarivo"):
     return f"{lieu}, le {date_obj.day} {MOIS_FR[date_obj.month]} {date_obj.year}"
 
 # ==========================================================
-# PDF CONVOCATION ENTRETIEN (déjà existant, tsy mikitika)
+# FONCTION POUR NETTOYER LE TEXTE (AJOUTÉE)
+# ==========================================================
+def clean_text(text):
+    """Nettoyer le texte pour éviter les problèmes d'encoding dans PDF"""
+    if not text:
+        return ""
+    
+    # Supprimer les emojis
+    emoji_pattern = re.compile("["
+        u"\U0001F600-\U0001F64F"  # emoticons
+        u"\U0001F300-\U0001F5FF"  # symbols & pictographs
+        u"\U0001F680-\U0001F6FF"  # transport & map symbols
+        u"\U0001F1E0-\U0001F1FF"  # flags
+        u"\U00002702-\U000027B0"
+        u"\U000024C2-\U0001F251"
+        "]+", flags=re.UNICODE)
+    
+    text = emoji_pattern.sub('', text)
+    
+    # Normaliser les caractères français
+    replacements = {
+        'à': 'a', 'â': 'a', 'ä': 'a',
+        'é': 'e', 'è': 'e', 'ê': 'e', 'ë': 'e',
+        'î': 'i', 'ï': 'i',
+        'ô': 'o', 'ö': 'o',
+        'ù': 'u', 'û': 'u', 'ü': 'u',
+        'ç': 'c',
+        'œ': 'oe', 'æ': 'ae',
+        'À': 'A', 'Â': 'A', 'Ä': 'A',
+        'É': 'E', 'È': 'E', 'Ê': 'E', 'Ë': 'E',
+        'Î': 'I', 'Ï': 'I',
+        'Ô': 'O', 'Ö': 'O',
+        'Ù': 'U', 'Û': 'U', 'Ü': 'U',
+        'Ç': 'C',
+        'Œ': 'OE', 'Æ': 'AE',
+    }
+    
+    for old, new in replacements.items():
+        text = text.replace(old, new)
+    
+    # Encoder en latin-1 safe
+    try:
+        text = text.encode('latin-1', 'ignore').decode('latin-1')
+    except:
+        try:
+            text = text.encode('utf-8', 'ignore').decode('utf-8')
+        except:
+            text = text.encode('ascii', 'ignore').decode('ascii')
+    
+    return text.strip()
+
+# ==========================================================
+# PDF CONVOCATION ENTRETIEN (CORRIGÉ)
 # ==========================================================
 def generate_convocation_pdf(candidat, convocation):
     pdf = FPDF()
@@ -44,16 +98,23 @@ def generate_convocation_pdf(candidat, convocation):
     pdf.cell(0, 10, "Convocation à l'entretien", ln=True, align="C")
     pdf.ln(12)
 
-    # Content
+    # Content - UTILISER clean_text
     pdf.set_font("Arial", "", 12)
-    nom_complet = getattr(candidat, "fullname", None) or \
-                  f"{getattr(candidat, 'prenom', '')} {getattr(candidat, 'nom', '')}".strip() \
-                  or "Candidat"
-    poste = getattr(candidat, "poste", "poste non défini")
-
+    
+    # Nettoyer les données
+    nom_complet_raw = getattr(candidat, "fullname", None) or \
+                      f"{getattr(candidat, 'prenom', '')} {getattr(candidat, 'nom', '')}".strip() \
+                      or "Candidat"
+    nom_complet = clean_text(nom_complet_raw)
+    
+    poste_raw = getattr(candidat, "poste", "poste non défini")
+    poste = clean_text(poste_raw)
+    
     date_entretien = getattr(convocation, "date_entretien", "à définir")
     heure_entretien = getattr(convocation, "heure_entretien", "à définir")
-    lieu_entretien = getattr(convocation, "lieu_entretien", "à définir")
+    
+    lieu_entretien_raw = getattr(convocation, "lieu_entretien", "à définir")
+    lieu_entretien = clean_text(lieu_entretien_raw)
 
     corps = f"""
 Bonjour {nom_complet},
@@ -78,16 +139,15 @@ Cordialement,
     pdf.cell(0, 10, date_str, ln=True)
     pdf.ln(5)
 
-
-
-    # File with timestamp
+    # File with timestamp - UTILISER nom nettoyé pour le nom de fichier
     timestamp = datetime.now().strftime("%Y%m%d%H%M%S")
-    file_path = f"/tmp/convocation_{candidat.id}_{timestamp}.pdf"
+    nom_fichier = re.sub(r'[^\w\s-]', '', nom_complet.replace(' ', '_'))
+    file_path = f"/tmp/convocation_{nom_fichier}_{timestamp}.pdf"
     pdf.output(file_path, 'F')
     return file_path
 
 # ==========================================================
-# PDF CONVOCATION DISCIPLINE (modifié)
+# PDF CONVOCATION DISCIPLINE (CORRIGÉ)
 # ==========================================================
 def generate_convocation_discipline_pdf(candidat, convocation):
     pdf = FPDF()
@@ -104,18 +164,25 @@ def generate_convocation_discipline_pdf(candidat, convocation):
 
     # Title
     pdf.set_font("Arial", "B", 16)
-    titre = f"Convocation disciplinaire - {convocation.get('fault_type', 'Faute')}"
+    titre_raw = f"Convocation disciplinaire - {convocation.get('fault_type', 'Faute')}"
+    titre = clean_text(titre_raw)
     pdf.cell(0, 10, titre, ln=True, align="C")
     pdf.ln(12)
 
     # Content
     pdf.set_font("Arial", "", 12)
-    nom_complet = getattr(candidat, "fullname", None) or \
-                  f"{getattr(candidat, 'prenom','')} {getattr(candidat,'nom','')}".strip() or "Employé"
-    type_faute = convocation.get("fault_type", "à définir")
+    nom_complet_raw = getattr(candidat, "fullname", None) or \
+                      f"{getattr(candidat, 'prenom','')} {getattr(candidat,'nom','')}".strip() or "Employé"
+    nom_complet = clean_text(nom_complet_raw)
+    
+    type_faute_raw = convocation.get("fault_type", "à définir")
+    type_faute = clean_text(type_faute_raw)
+    
     date_conv = convocation.get("date_convocation", "à définir")
     heure_conv = convocation.get("heure_convocation", "à définir")
-    lieu_corps = convocation.get("lieu_convocation", "Bureau RH")  # dynamique avy amin'ny formulaire
+    
+    lieu_corps_raw = convocation.get("lieu_convocation", "Bureau RH")
+    lieu_corps = clean_text(lieu_corps_raw)
 
     corps = f"""
 Bonjour {nom_complet},
@@ -134,22 +201,22 @@ Cordialement,
     pdf.multi_cell(0, 8, corps)
     pdf.ln(15)
 
-    # Footer date avec lieu dynamique et mois en français
-    lieu_footer = convocation.get("lieu_convocation", "Antananarivo")
+    # Footer date avec lieu dynamique
+    lieu_footer_raw = convocation.get("lieu_convocation", "Antananarivo")
+    lieu_footer = clean_text(lieu_footer_raw)
     pdf.set_font("Arial", "I", 11)
     pdf.cell(0, 10, date_fr(datetime.now(), lieu_footer), ln=True)
     pdf.ln(5)
 
-
-
     # File with timestamp
     timestamp = datetime.now().strftime("%Y%m%d%H%M%S")
-    file_path = f"/tmp/convocation_discipline_{candidat.id}_{timestamp}.pdf"
+    nom_fichier = re.sub(r'[^\w\s-]', '', nom_complet.replace(' ', '_'))
+    file_path = f"/tmp/convocation_discipline_{nom_fichier}_{timestamp}.pdf"
     pdf.output(file_path, 'F')
     return file_path
 
 # ==========================================================
-# PDF DECISION DISCIPLINAIRE (déjà existant, tsy mikitika)
+# PDF DECISION DISCIPLINAIRE (CORRIGÉ)
 # ==========================================================
 def generate_decision_pdf(candidat, decision):
     pdf = FPDF()
@@ -159,16 +226,24 @@ def generate_decision_pdf(candidat, decision):
     pdf.cell(0, 10, "Décision disciplinaire", ln=True, align="C")
     pdf.ln(10)
 
-    nom_complet = getattr(candidat, "fullname", None) or \
-                  f"{getattr(candidat, 'prenom','')} {getattr(candidat,'nom','')}".strip() \
-                  or "Candidat"
+    nom_complet_raw = getattr(candidat, "fullname", None) or \
+                      f"{getattr(candidat, 'prenom','')} {getattr(candidat,'nom','')}".strip() \
+                      or "Candidat"
+    nom_complet = clean_text(nom_complet_raw)
 
     pdf.set_font("Arial", "", 12)
+    
+    decision_type_raw = getattr(decision, 'decision_type', '—')
+    decision_type = clean_text(decision_type_raw)
+    
+    decision_notes_raw = getattr(decision, 'decision_notes', '—')
+    decision_notes = clean_text(decision_notes_raw)
+    
     pdf.multi_cell(
         0, 8,
         f"Employé : {nom_complet}\n"
-        f"Sazy : {getattr(decision, 'decision_type', '—')}\n"
-        f"Fanazavana : {getattr(decision, 'decision_notes', '—')}"
+        f"Sanction : {decision_type}\n"
+        f"Explication : {decision_notes}"
     )
     pdf.ln(15)
 
@@ -177,12 +252,13 @@ def generate_decision_pdf(candidat, decision):
     pdf.cell(0, 10, date_str, ln=True)
 
     timestamp = datetime.now().strftime("%Y%m%d%H%M%S")
-    file_path = f"/tmp/decision_{candidat.id}_{timestamp}.pdf"
+    nom_fichier = re.sub(r'[^\w\s-]', '', nom_complet.replace(' ', '_'))
+    file_path = f"/tmp/decision_{nom_fichier}_{timestamp}.pdf"
     pdf.output(file_path, 'F')
     return file_path
 
 # ==========================================================
-# PDF LETTRE DE LICENCIEMENT (déjà existant, tsy mikitika)
+# PDF LETTRE DE LICENCIEMENT (CORRIGÉ)
 # ==========================================================
 def generate_licenciement_letter(candidat, data):
     pdf = FPDF()
@@ -194,13 +270,16 @@ def generate_licenciement_letter(candidat, data):
     pdf.ln(12)
 
     # Employee
-    nom_complet = getattr(candidat, "fullname", None) or \
-                  f"{getattr(candidat, 'prenom','')} {getattr(candidat,'nom','')}".strip() \
-                  or "Candidat"
+    nom_complet_raw = getattr(candidat, "fullname", None) or \
+                      f"{getattr(candidat, 'prenom','')} {getattr(candidat,'nom','')}".strip() \
+                      or "Candidat"
+    nom_complet = clean_text(nom_complet_raw)
 
     pdf.set_font("Arial", "", 12)
 
-    motif = data.get("motif", "Non précisé") if data else "Non précisé"
+    motif_raw = data.get("motif", "Non précisé") if data else "Non précisé"
+    motif = clean_text(motif_raw)
+    
     date_effet = data.get("date", datetime.now().strftime("%d/%m/%Y")) if data else datetime.now().strftime("%d/%m/%Y")
 
     corps = f"""
@@ -209,7 +288,7 @@ Madame/Monsieur {nom_complet},
 Par la présente, nous vous informons officiellement de votre licenciement.
 
 Motif : {motif}
-Date d’effet : {date_effet}
+Date d'effet : {date_effet}
 
 Vous serez contacté(e) par le service RH pour les formalités administratives.
 
@@ -224,6 +303,17 @@ Cordialement,
     pdf.cell(0, 10, date_str, ln=True)
 
     timestamp = datetime.now().strftime("%Y%m%d%H%M%S")
-    file_path = f"/tmp/lettre_licenciement_{candidat.id}_{timestamp}.pdf"
+    nom_fichier = re.sub(r'[^\w\s-]', '', nom_complet.replace(' ', '_'))
+    file_path = f"/tmp/lettre_licenciement_{nom_fichier}_{timestamp}.pdf"
     pdf.output(file_path, 'F')
     return file_path
+
+# ==========================================================
+# FONCTION UTILITAIRE SUPPLEMENTAIRE
+# ==========================================================
+def clean_candidate_name(candidat):
+    """Nettoyer le nom d'un candidat pour usage PDF"""
+    nom_complet_raw = getattr(candidat, "fullname", None) or \
+                      f"{getattr(candidat, 'prenom', '')} {getattr(candidat, 'nom', '')}".strip() \
+                      or "Candidat"
+    return clean_text(nom_complet_raw)

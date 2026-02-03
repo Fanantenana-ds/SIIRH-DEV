@@ -72,8 +72,7 @@ class ContratUpdate(BaseModel):
     clauses: Optional[str] = None
     type_travail: Optional[str] = None
     preavis: Optional[str] = None
-    indemnites: Optional[str] = None
-
+    indemnites: Optional[float] = None
 
 class ContratOut(ContratBase):
     id: int

@@ -1,5 +1,6 @@
 from pydantic import BaseModel
 from typing import Optional
+from datetime import datetime
 
 # 🔹 Schema création convocation
 class ConvocationCreate(BaseModel):
@@ -16,6 +17,7 @@ class ConvocationRead(BaseModel):
     lieu_entretien: str
     status: str
     candidature_id: Optional[int]
+    created_at: Optional[datetime]
 
     class Config:
         from_attributes = True  # Pydantic v2 equivalent de orm_mode

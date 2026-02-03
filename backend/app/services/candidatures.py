@@ -9,7 +9,7 @@ def create_candidature(db: Session, data: dict) -> CandidatureResponse:
     db_cand = Candidature(
         fullname=data["fullname"],
         email=data["email"],
-        phone=data.get("phone"),
+        telephone=data.get("phone"),
         source=data.get("source", "web_form"),
         raw_cv_path=data["raw_cv_path"],
         parsed_json=data["parsed_json"],

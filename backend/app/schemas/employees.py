@@ -55,7 +55,7 @@ class EmployeeBase(BaseModel):
     prenom: Optional[str] = "Inconnu"
     email: Optional[str] = None
     poste: Optional[str] = None
-    phone: Optional[str] = None
+    telephone: Optional[str] = None
     date_embauche: Optional[date] = None
 
 class EmployeeCreate(EmployeeBase):

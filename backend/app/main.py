@@ -1,3 +1,4 @@
+#app/main.py
 import os
 import shutil
 from pathlib import Path
@@ -25,6 +26,8 @@ from app.routers import time_entries, leaves, payroll, absences
 from app.routers.pointages import router as pointages_router 
 from app.routers import settings_smtp
 from app.routers import mail_listener
+from app.routers import candidature_selection,candidature_rh, convocation
+
 
 # ==========================================================
 # 🚀 CONFIGURATION GÉNÉRALE
@@ -54,6 +57,7 @@ UPLOAD_DIR.mkdir(exist_ok=True)
 @app.get("/")
 async def root():
     return {"message": "Bienvenue sur l’API SIIRH 🎉"}
+
 
 # ==========================================================
 # 📁 INCLUSION ROUTERS
@@ -86,13 +90,18 @@ app.include_router(candidatures.router, prefix="/api/candidatures", tags=["Candi
 app.mount("/exports", StaticFiles(directory="app/exports"), name="exports")
 app.include_router(settings_smtp.router, prefix="/api")
 app.include_router(mail_listener.router)
+app.include_router(candidature_selection.router, prefix="/rh/candidatures",  tags=["Candidature Selection"])
+
+# ✅ Candidatures RH
+app.include_router(candidature_rh.router, prefix="/rh", tags=["Candidatures RH"])
+app.include_router(convocation.router, prefix="/rh/convocations", tags=["Convocations RH"])
 
 # ==========================================================
 # 🧾 FORMULAIRE DE CANDIDATURE
 # ==========================================================
 @app.post("/api/candidatures")
 async def create_candidature(
-    ref_offre: str = Form(...),  # ✅ recup ref_offre
+    ref_offre: str = Form(...),
     nom: str = Form(...),
     prenom: str = Form(...),
     email: str = Form(...),
@@ -133,24 +142,28 @@ async def create_candidature(
                 raise HTTPException(status_code=400, detail="Référence d'offre invalide")
             offre_id = result.id
 
-        # ✅ Insert candidature avec offre_id
+        # ✅ VERSION CORRIGÉE COMPLÈTE (avec ref_offre)
         query = sqlalchemy.text("""
             INSERT INTO candidatures (
-                offre_id, nom, prenom, email, phone, adresse, date_naissance, poste,
-                disponibilite, salaire, type_contrat, mobilite, autorisation,
-                cv_path, lettre_path, diplomes_path, date_candidature, statut, score
+                offre_id, ref_offre, nom, prenom, fullname, email, phone, adresse, 
+                date_naissance, poste, disponibilite, salaire, type_contrat, 
+                mobilite, autorisation, cv_path, lettre_path, diplomes_path, 
+                date_candidature, statut, score
             ) VALUES (
-                :offre_id, :nom, :prenom, :email, :phone, :adresse, :date_naissance, :poste,
-                :disponibilite, :salaire, :type_contrat, :mobilite, :autorisation,
-                :cv_path, :lettre_path, :diplomes_path, :date_candidature, :statut, :score
+                :offre_id, :ref_offre, :nom, :prenom, :fullname, :email, :phone, :adresse, 
+                :date_naissance, :poste, :disponibilite, :salaire, :type_contrat, 
+                :mobilite, :autorisation, :cv_path, :lettre_path, :diplomes_path, 
+                :date_candidature, :statut, :score
             )
         """)
 
         with engine.begin() as conn:
             res = conn.execute(query, {
                 "offre_id": offre_id,
+                "ref_offre": ref_offre,  # ⬅️ TRÈS IMPORTANT!
                 "nom": nom,
                 "prenom": prenom,
+                "fullname": f"{nom} {prenom}",
                 "email": email,
                 "phone": phone,
                 "adresse": adresse,
@@ -168,6 +181,7 @@ async def create_candidature(
                 "statut": "En attente",
                 "score": 0.0,
             })
+            
             # ✅ Insert automatique notification pour RH
             conn.execute(
                 sqlalchemy.text("INSERT INTO notifications (message, read, date) VALUES (:message, false, :date)"),
@@ -180,6 +194,44 @@ async def create_candidature(
         import traceback
         print(traceback.format_exc())
         raise HTTPException(status_code=500, detail=f"Erreur : {e}")
+#=========================================================
+# Ajouter dans main.py
+@app.post("/api/candidatures/{candidature_id}/selectionner")
+def selectionner_candidature(candidature_id: int):
+    from sqlalchemy import text
+    
+    with engine.connect() as conn:
+        try:
+            # 1. Mettre à jour le statut
+            update_query = text("""
+                UPDATE candidatures 
+                SET statut = 'Sélectionné',
+                    date_maj = CURRENT_TIMESTAMP
+                WHERE id = :id
+            """)
+            conn.execute(update_query, {"id": candidature_id})
+            conn.commit()
+            
+            # 2. Vérifier la mise à jour
+            check_query = text("SELECT id, fullname, statut FROM candidatures WHERE id = :id")
+            result = conn.execute(check_query, {"id": candidature_id}).fetchone()
+            
+            return {
+                "success": True,
+                "message": f"Candidature {candidature_id} sélectionnée",
+                "data": {
+                    "id": result[0],
+                    "nom": result[1],
+                    "statut": result[2]
+                }
+            }
+            
+        except Exception as e:
+            conn.rollback()
+            return {"success": False, "error": str(e)}
+
+
+
 
 # ==========================================================
 # 🧩 MODULE ENTRETIEN RH
