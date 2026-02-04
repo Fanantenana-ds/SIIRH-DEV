@@ -1,7 +1,7 @@
 
 
 # app/models/models.py - VERSION COMPLÈTE
-from sqlalchemy import Column, Integer, String, Float, ForeignKey, Text, JSON, DateTime, Date, Time
+from sqlalchemy import Column, Integer, String, Float, ForeignKey, Text, JSON, DateTime, Date, Time,Boolean
 from sqlalchemy.orm import relationship
 from app.db import Base
 from datetime import datetime, date, time
@@ -149,8 +149,9 @@ class SMTPConfig(Base):
     id = Column(Integer, primary_key=True, index=True)
     email = Column(String, nullable=False)
     password = Column(String, nullable=False)
-    server = Column(String, default="smtp.gmail.com")
     port = Column(Integer, default=587)
+    host = Column(String(255), default="smtp.gmail.com") 
+    use_tls = Column(Boolean, default=True)
 
 
 # ==================== AUDIT LOG ====================

@@ -1,10 +1,14 @@
-# from fastapi import APIRouter, UploadFile, File, Form, Depends, HTTPException
+# # app/routers/discipline.py
+# from app.models.models import Employee as EmployeeModel
+# from fastapi import APIRouter, UploadFile, File, Form, Depends, HTTPException, Body
 # from sqlalchemy.orm import Session
 # from typing import List
 # from datetime import datetime
 # import json
 # import os
 # from fastapi.responses import FileResponse
+# from pydantic import BaseModel
+# from app import crud
 
 # from app.schemas.employees import Employee  
 # from app import crud, schemas
@@ -58,7 +62,16 @@
 # # ==========================================================
 # @router.get("/cases", response_model=List[schemas.DisciplineCase])
 # def list_cases(db: Session = Depends(get_db)):
-#     return crud.list_cases(db)
+#     cases = crud.list_cases(db)
+
+#     for c in cases:
+#         emp = crud.get_employee(db, c["employee_id"])
+#         if emp:
+#             c["employee_name"] = emp.fullname
+#         else:
+#             c["employee_name"] = "—"
+
+#     return cases
 
 # # ==========================================================
 # # 3. DETAILS
@@ -69,7 +82,6 @@
 #     if not case:
 #         raise HTTPException(status_code=404, detail="Case non trouvé")
 
-#     # --- Ajouter le compte_rendu depuis le dernier event de type 'decision' ---
 #     last_decision_event = crud.get_last_event_of_type(db, case_id, "decision")
 #     if last_decision_event:
 #         decision_data = json.loads(last_decision_event.event_data)
@@ -79,11 +91,10 @@
 #         }
 #         case["compte_rendu"] = decision_data.get("notes", "")
 #     else:
-#         case["decision"] = None
-#         case["compte_rendu"] = ""
+#         case.decision = None
+#         case.compte_rendu= ""
         
-#     # --- Ajouter les fichiers ---
-#     case["files"] = [
+#     case.files = [
 #         {"filename": f.file_name, "filepath": f.file_url}
 #         for f in crud.get_evidences(db, case_id)
 #     ]
@@ -103,7 +114,6 @@
 #     if not emp:
 #         raise HTTPException(status_code=404, detail="Employé non trouvé")
 
-#     # Generate PDF
 #     pdf_path = generate_convocation_pdf(
 #         emp,
 #         {
@@ -174,31 +184,50 @@
 #     return {"message": "Email envoyé", "pdf": pdf_path}
 
 # # ==========================================================
-# # 7. LISTE EMPLOYES
+# # 7. LISTE EMPLOYES (PATCHED)
 # # ==========================================================
 # @router.get("/employees", response_model=List[Employee])
 # def list_employees(db: Session = Depends(get_db)):
-#     employees = crud.list_employees(db)
-#     return [
-#         Employee(
-#             id=e.id,
-#             nom=e.nom,
-#             prenom=e.prenom,
-#             fullname=f"{e.nom} {e.prenom}",
-#             email=e.email,
-#             poste=e.poste
+#     employees = db.query(EmployeeModel).all()
+
+#     result = []
+#     for e in employees:
+#         nom = "Inconnu"
+#         prenom = "Inconnu"
+
+#         if e.fullname:
+#             parts = e.fullname.strip().split(" ", 1)
+#             nom = parts[0]
+#             prenom = parts[1] if len(parts) > 1 else ""
+
+#         result.append(
+#             Employee(
+#                 id=e.id,
+#                 nom=nom,
+#                 prenom=prenom,
+#                 email=e.email,
+#                 poste=e.poste,
+#                 phone=getattr(e, "telephone", None),
+#                 candidature_id=e.candidature_id,
+#                 fullname=e.fullname,
+#             )
 #         )
-#         for e in employees
-#     ]
+
+#     return result
+
+
+
 # # ==========================================================
-# # 4b. PDF CONVOCATION DISCIPLINE (NOUVEAU)
+# # 4b. PDF CONVOCATION DISCIPLINE (NOUVEAU) AVEC Pydantic
 # # ==========================================================
-# from fastapi import Body  # ampio ao amin'ny imports
+# class ConvocationData(BaseModel):
+#     date_convocation: str
+#     heure_convocation: str
 
 # @router.post("/cases/{case_id}/convocation-discipline")
 # def create_convocation_discipline(
 #     case_id: int,
-#     convocation: dict = Body(...),  # mandray date sy heure avy amin'ny frontend
+#     convocation: ConvocationData,
 #     db: Session = Depends(get_db)
 # ):
 #     case = crud.get_case(db, case_id)
@@ -209,11 +238,10 @@
 #     if not emp:
 #         raise HTTPException(status_code=404, detail="Employé non trouvé")
 
-#     # Générer PDF discipline mifanaraka amin'ny type de faute
 #     convocation_data = {
 #         "fault_type": case["fault_type"],
-#         "date_convocation": convocation.get("date_convocation", "à définir"),
-#         "heure_convocation": convocation.get("heure_convocation", "à définir"),
+#         "date_convocation": convocation.date_convocation,
+#         "heure_convocation": convocation.heure_convocation,
 #         "lieu_convocation": "Bureau RH"
 #     }
 
@@ -226,37 +254,34 @@
 
 
 # # ==========================================================
-# # ENVOI MAIL CONVOCATION DISCIPLINE
+# # ENVOI MAIL CONVOCATION DISCIPLINE AVEC Pydantic
 # # ==========================================================
 # @router.post("/cases/{case_id}/send-convocation-discipline-mail")
 # def send_convocation_discipline_email(
 #     case_id: int,
-#     convocation: dict = Body(...),  # mandray date sy heure avy amin'ny frontend
+#     convocation: ConvocationData,
 #     db: Session = Depends(get_db)
 # ):
-
 #     case = crud.get_case(db, case_id)
 #     if not case:
 #         raise HTTPException(status_code=404, detail="Case non trouvé")
+    
+#     emp = crud.get_employee(db, case.employee_id)
 
-#     emp = crud.get_employee(db, case["employee_id"])
-#     if not emp:
-#         raise HTTPException(status_code=404, detail="Employé non trouvé")
+#     case["employee_name"] = emp.fullname if emp else "—"
 
-#     # Générer PDF discipline
-#     from app.utils.pdf_generator import generate_convocation_discipline_pdf
 #     convocation_data = {
 #         "fault_type": case["fault_type"],
-#         "date_convocation": convocation.get("date_convocation", "à définir"),
-#         "heure_convocation": convocation.get("heure_convocation", "à définir"),
+#         "date_convocation": convocation.date_convocation,
+#         "heure_convocation": convocation.heure_convocation,
 #         "lieu_convocation": "Bureau RH"
 #     }
+
+#     from app.utils.pdf_generator import generate_convocation_discipline_pdf
 #     pdf_path = generate_convocation_discipline_pdf(emp, convocation_data)
 
-#     # Ajouter événement
 #     crud.add_event(db, case_id, "convocation_discipline", {"pdf": pdf_path})
 
-#     # Envoyer mail
 #     send_mail(
 #         to=emp.email,
 #         subject="Convocation disciplinaire",
@@ -266,28 +291,18 @@
 
 #     return {"message": "Email envoyé", "pdf": pdf_path}
 
-
-
-
-
-
-
-
-
-
-
-
-
-
+# app/routers/discipline.py - VERSION CORRIGÉE
 from app.models.models import Employee as EmployeeModel
+from app.models.discipline import DisciplineCase as DisciplineCaseModel, DisciplineEvidence, DisciplineEvent  # <-- IMPORT CORRECT
 from fastapi import APIRouter, UploadFile, File, Form, Depends, HTTPException, Body
 from sqlalchemy.orm import Session
-from typing import List
+from typing import List, Optional
 from datetime import datetime
 import json
 import os
 from fastapi.responses import FileResponse
 from pydantic import BaseModel
+from app import crud
 
 from app.schemas.employees import Employee  
 from app import crud, schemas
@@ -302,7 +317,7 @@ from app.utils.mailer import send_mail
 router = APIRouter(prefix="/discipline", tags=["Discipline"])
 
 # ==========================================================
-# 1. CREER DOSSIER
+# 1. CREER DOSSIER - CORRIGÉ
 # ==========================================================
 @router.post("/cases", response_model=schemas.DisciplineCase)
 async def create_case(
@@ -316,11 +331,16 @@ async def create_case(
     if not emp:
         raise HTTPException(status_code=404, detail="Employé non trouvé")
 
+    # Assurer que fault_type n'est pas None
+    if not fault_type or fault_type.strip() == "":
+        fault_type = "Non spécifié"
+
     case_data = schemas.DisciplineCaseCreate(
         employee_id=employee_id,
         fault_type=fault_type,
         description=description
     )
+    
     db_case = crud.create_discipline_case(db, case_data)
 
     # Save files
@@ -339,19 +359,20 @@ async def create_case(
 # ==========================================================
 # 2. LISTE DES DOSSIERS
 # ==========================================================
+# app/routers/discipline.py - Line 367
 @router.get("/cases", response_model=List[schemas.DisciplineCase])
 def list_cases(db: Session = Depends(get_db)):
     cases = crud.list_cases(db)
 
     for c in cases:
-        emp = crud.get_employee(db, c["employee_id"])
+        # 'c' dia objet Pydantic ankehitriny, tsy dict
+        emp = crud.get_employee(db, c.employee_id)  # <-- METY
         if emp:
-            c["employee_name"] = emp.fullname
+            c.employee_name = emp.fullname
         else:
-            c["employee_name"] = "—"
+            c.employee_name = "—"
 
     return cases
-
 # ==========================================================
 # 3. DETAILS
 # ==========================================================
@@ -364,16 +385,16 @@ def get_case(case_id: int, db: Session = Depends(get_db)):
     last_decision_event = crud.get_last_event_of_type(db, case_id, "decision")
     if last_decision_event:
         decision_data = json.loads(last_decision_event.event_data)
-        case["decision"] = {
+        case.decision = {
             "decision_type": decision_data.get("type", ""),
             "decision_notes": decision_data.get("notes", "")
         }
-        case["compte_rendu"] = decision_data.get("notes", "")
+        case.compte_rendu = decision_data.get("notes", "")
     else:
-        case["decision"] = None
-        case["compte_rendu"] = ""
+        case.decision = None
+        case.compte_rendu = ""
         
-    case["files"] = [
+    case.files = [
         {"filename": f.file_name, "filepath": f.file_url}
         for f in crud.get_evidences(db, case_id)
     ]
@@ -389,7 +410,7 @@ def create_convocation(case_id: int, db: Session = Depends(get_db)):
     if not case:
         raise HTTPException(status_code=404, detail="Case non trouvé")
 
-    emp = crud.get_employee(db, case["employee_id"])
+    emp = crud.get_employee(db, case.employee_id)
     if not emp:
         raise HTTPException(status_code=404, detail="Employé non trouvé")
 
@@ -402,7 +423,7 @@ def create_convocation(case_id: int, db: Session = Depends(get_db)):
         }
     )
 
-    crud.add_event(db, case_id, "convocation", {"pdf": pdf_path})
+    crud.add_event(db, case_id, "convocation", json.dumps({"pdf": pdf_path}))
 
     return FileResponse(pdf_path, media_type="application/pdf")
 
@@ -411,26 +432,25 @@ def create_convocation(case_id: int, db: Session = Depends(get_db)):
 # ==========================================================
 @router.post("/cases/{case_id}/decision")
 def create_decision(case_id: int, decision: schemas.Decision, db: Session = Depends(get_db)):
-
     case = crud.get_case(db, case_id)
     if not case:
         raise HTTPException(status_code=404, detail="Case non trouvé")
 
-    emp = crud.get_employee(db, case["employee_id"])
+    emp = crud.get_employee(db, case.employee_id)
 
     pdf_path = generate_decision_pdf(emp, decision)
 
-    crud.add_event(db, case_id, "decision", {
+    crud.add_event(db, case_id, "decision", json.dumps({
         "type": decision.decision_type,
         "notes": decision.decision_notes,
         "pdf": pdf_path
-    })
+    }))
 
     crud.update_case_status(db, case_id, decision.decision_type)
 
     if decision.decision_type == "Licenciement":
         lettre_path = generate_licenciement_letter(emp, None)
-        crud.add_event(db, case_id, "lettre_licenciement", {"pdf": lettre_path})
+        crud.add_event(db, case_id, "lettre_licenciement", json.dumps({"pdf": lettre_path}))
 
     return FileResponse(pdf_path, media_type="application/pdf")
 
@@ -439,12 +459,11 @@ def create_decision(case_id: int, decision: schemas.Decision, db: Session = Depe
 # ==========================================================
 @router.post("/cases/{case_id}/send-convocation-mail")
 def send_convocation_email(case_id: int, db: Session = Depends(get_db)):
-
     case = crud.get_case(db, case_id)
     if not case:
         raise HTTPException(status_code=404, detail="Case non trouvé")
 
-    emp = crud.get_employee(db, case["employee_id"])
+    emp = crud.get_employee(db, case.employee_id)
 
     event = crud.get_last_event_of_type(db, case_id, "convocation")
     if not event:
@@ -457,13 +476,14 @@ def send_convocation_email(case_id: int, db: Session = Depends(get_db)):
         to=emp.email,
         subject="Convocation entretien disciplinaire",
         body=f"Bonjour {emp.nom},\nVeuillez trouver ci-joint votre convocation.",
-        attachments=[pdf_path]
+        attachments=[pdf_path],
+        db_session=db
     )
 
     return {"message": "Email envoyé", "pdf": pdf_path}
 
 # ==========================================================
-# 7. LISTE EMPLOYES (PATCHED)
+# 7. LISTE EMPLOYES
 # ==========================================================
 @router.get("/employees", response_model=List[Employee])
 def list_employees(db: Session = Depends(get_db)):
@@ -486,7 +506,7 @@ def list_employees(db: Session = Depends(get_db)):
                 prenom=prenom,
                 email=e.email,
                 poste=e.poste,
-                phone=e.phone,
+                phone=getattr(e, "telephone", None),
                 candidature_id=e.candidature_id,
                 fullname=e.fullname,
             )
@@ -494,10 +514,8 @@ def list_employees(db: Session = Depends(get_db)):
 
     return result
 
-
-
 # ==========================================================
-# 4b. PDF CONVOCATION DISCIPLINE (NOUVEAU) AVEC Pydantic
+# 8. PDF CONVOCATION DISCIPLINE
 # ==========================================================
 class ConvocationData(BaseModel):
     date_convocation: str
@@ -509,16 +527,18 @@ def create_convocation_discipline(
     convocation: ConvocationData,
     db: Session = Depends(get_db)
 ):
-    case = crud.get_case(db, case_id)
-    if not case:
+    case_db = db.query(DisciplineCaseModel).filter(DisciplineCaseModel.id == case_id).first()
+    if not case_db:
         raise HTTPException(status_code=404, detail="Case non trouvé")
 
-    emp = crud.get_employee(db, case["employee_id"])
+    emp = crud.get_employee(db, case_db.employee_id)
     if not emp:
         raise HTTPException(status_code=404, detail="Employé non trouvé")
 
+    fault_type = getattr(case_db, 'fault_type', 'Non spécifié')
+
     convocation_data = {
-        "fault_type": case["fault_type"],
+        "fault_type": fault_type,
         "date_convocation": convocation.date_convocation,
         "heure_convocation": convocation.heure_convocation,
         "lieu_convocation": "Bureau RH"
@@ -527,13 +547,12 @@ def create_convocation_discipline(
     from app.utils.pdf_generator import generate_convocation_discipline_pdf
     pdf_path = generate_convocation_discipline_pdf(emp, convocation_data)
 
-    crud.add_event(db, case_id, "convocation_discipline", {"pdf": pdf_path})
+    crud.add_event(db, case_id, "convocation_discipline", json.dumps({"pdf": pdf_path}))
 
     return FileResponse(pdf_path, media_type="application/pdf")
 
-
 # ==========================================================
-# ENVOI MAIL CONVOCATION DISCIPLINE AVEC Pydantic
+# 9. ENVOI MAIL CONVOCATION DISCIPLINE - VERSION CORRIGÉE
 # ==========================================================
 @router.post("/cases/{case_id}/send-convocation-discipline-mail")
 def send_convocation_discipline_email(
@@ -541,15 +560,21 @@ def send_convocation_discipline_email(
     convocation: ConvocationData,
     db: Session = Depends(get_db)
 ):
-    case = crud.get_case(db, case_id)
-    if not case:
+    # Get case directly from database
+    case_db = db.query(DisciplineCaseModel).filter(DisciplineCaseModel.id == case_id).first()
+    if not case_db:
         raise HTTPException(status_code=404, detail="Case non trouvé")
     
-    emp = crud.get_employee(db, case["employee_id"])
-    case["employee_name"] = emp.fullname if emp else "—"
+    # Get employee
+    emp = crud.get_employee(db, case_db.employee_id)
+    if not emp:
+        raise HTTPException(status_code=404, detail="Employé non trouvé")
+
+    # Get fault_type avec fallback
+    fault_type = getattr(case_db, 'fault_type', 'Non spécifié')
 
     convocation_data = {
-        "fault_type": case["fault_type"],
+        "fault_type": fault_type,
         "date_convocation": convocation.date_convocation,
         "heure_convocation": convocation.heure_convocation,
         "lieu_convocation": "Bureau RH"
@@ -558,16 +583,25 @@ def send_convocation_discipline_email(
     from app.utils.pdf_generator import generate_convocation_discipline_pdf
     pdf_path = generate_convocation_discipline_pdf(emp, convocation_data)
 
-    crud.add_event(db, case_id, "convocation_discipline", {"pdf": pdf_path})
+    crud.add_event(db, case_id, "convocation_discipline", json.dumps({"pdf": pdf_path}))
 
+    # Send email
     send_mail(
         to=emp.email,
         subject="Convocation disciplinaire",
-        body=f"Bonjour {emp.nom},\nVeuillez trouver ci-joint votre convocation disciplinaire.\n\nDate : {convocation_data['date_convocation']}\nHeure : {convocation_data['heure_convocation']}\nLieu : {convocation_data['lieu_convocation']}",
-        attachments=[pdf_path]
+        body=f"""Bonjour {emp.fullname if emp.fullname else 'Collègue'},
+
+Veuillez trouver ci-joint votre convocation disciplinaire.
+
+Type de faute : {convocation_data['fault_type']}
+Date : {convocation_data['date_convocation']}
+Heure : {convocation_data['heure_convocation']}
+Lieu : {convocation_data['lieu_convocation']}
+
+Cordialement,
+Service RH""",
+        attachments=[pdf_path],
+        db_session=db
     )
 
     return {"message": "Email envoyé", "pdf": pdf_path}
-
-
-

@@ -59,7 +59,7 @@ class Contrat(Base):
     horaire_travail = Column(String(50), nullable=True)   # plein temps / partiel
     preavis = Column(String(50), nullable=True)           # généré auto
     type_travail = Column(String)  
-    indemnites = Column(Float)     
+    indemnites = Column(Text)  # na String     
     employee_id = Column(Integer, ForeignKey("employees.id"))
      # ex: "CDI", "CDD", etc.
     # CHANGEMENT ICI: back_populates au lieu de backref
