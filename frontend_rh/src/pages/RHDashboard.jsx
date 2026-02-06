@@ -111,9 +111,9 @@ const RHDashboard = () => {
     let [start, end] = rangeInput.split("-").map(n => parseInt(n.trim(), 10));
     if (!end) end = start;
     if (!start || !end || start > end) return alert("Format invalide (ex: 1-100 ou 7)");
-  const selectionnes = filtered.filter(c => c.statut === "Sélectionné").sort((a,b)=>(b.score_total||0)-(a.score_total||0));
+    const selectionnes = filtered.filter(c => c.statut === "Sélectionné").sort((a, b) => (b.score_total || 0) - (a.score_total || 0));
     if (start > selectionnes.length) return alert("Le rang de début est supérieur au nombre de sélectionnés");
-    if (end > selectionnes.length) end = selectionnes.length; 
+    if (end > selectionnes.length) end = selectionnes.length;
     const toDeselect = selectionnes.slice(start - 1, end);
     for (const c of toDeselect) await handleDeselect(c.id);
     alert(`Les candidats du rang ${start} à ${end} ont été désélectionnés.`);
@@ -297,10 +297,10 @@ const RHDashboard = () => {
 
       {view !== "overview" && (
         <div className="mt-10">
-          <button onClick={() => setView("overview")} className="back-btn mb-5">⬅️ Retour à la Vue d’ensemble</button>
-          <h2 className="text-xl font-bold text-green-700 mb-4">{titreTableau[view]}</h2>
-          
-          {view==="total"&&<div style={{marginBottom:"10px",fontSize:"14px",color:"#555"}}>{posteSearch?<>Candidats <b>{posteSearch}</b> : <b>{filtered.length}</b></>:<>Total candidats : <b>{filtered.length}</b></>}</div>}
+          <button onClick={() => setView("overview")} className="mb-5 back-btn">⬅️ Retour à la Vue d’ensemble</button>
+          <h2 className="mb-4 text-xl font-bold text-green-700">{titreTableau[view]}</h2>
+
+          {view === "total" && <div style={{ marginBottom: "10px", fontSize: "14px", color: "#555" }}>{posteSearch ? <>Candidats <b>{posteSearch}</b> : <b>{filtered.length}</b></> : <>Total candidats : <b>{filtered.length}</b></>}</div>}
 
           {(view === "selectionnee" || view === "fait_entretien" || view === "employees") && (
             <div style={{ marginBottom: "10px" }}>
@@ -339,7 +339,7 @@ const RHDashboard = () => {
                         </td>
                       )}
                       <td>{c.id}</td>
-                      <td>{(view==="employees" ? employees : filtered).indexOf(c) + 1}</td>
+                      <td>{(view === "employees" ? employees : filtered).indexOf(c) + 1}</td>
                       <td>{c.nom}</td>
                       <td>{c.prenom}</td>
                       <td>{c.poste}</td>
@@ -348,10 +348,10 @@ const RHDashboard = () => {
                         <td>
                           {view === "convoque"
                             ? `${c.date_entretien} ${c.heure_entretien}`
-                            : `${c.date_candidature ? new Date(c.date_candidature).toLocaleDateString() : "—"}`} 
+                            : `${c.date_candidature ? new Date(c.date_candidature).toLocaleDateString() : "—"}`}
                         </td>
                       )}
-                      <td>{view === "fait_entretien" ? `${c.score_total}/5` : (c.score_total !== null && c.score_total !== undefined ? c.score_total : "0")}</td>
+                      {view !== "employees" && <td>{view === "fait_entretien" ? `${c.score_total}/5` : (c.score_total !== null && c.score_total !== undefined ? c.score_total : "0")}</td>}
                       {view !== "employees" && <td className={`decision ${c.statut === "Sélectionné" ? "go" : c.statut === "Convoqué" ? "blue" : c.statut === "Désélectionné" ? "danger" : "hold"}`}>{c.decision || c.statut}</td>}
 
                       {view === "convoque" && selectedConvoques.includes(c.id) && (
@@ -365,7 +365,7 @@ const RHDashboard = () => {
                         </td>
                       )}
 
-                     {(view==="total"||view==="selectionnee")&&<td style={{whiteSpace:"nowrap",display:"flex",alignItems:"center",gap:"6px"}}>{view==="selectionnee"?<button onClick={()=>handleSendConvocation(c.id)} className="mini-btn blue">Envoyer convocation</button>:<>{index===0&&<input type="text" placeholder="Filtrer par poste" value={posteSearch} onChange={e=>{setPosteSearch(e.target.value);setFiltered(candidatures.filter(c=>c.poste.toLowerCase().includes(e.target.value.toLowerCase())))}} className="mini-input"/>}{index===1&&<input type="text" placeholder="1-100" value={rangeInput} onChange={e=>setRangeInput(e.target.value)} className="mini-input"/>}{index===2&&<button onClick={handleAutoSelectRange} className="mini-btn success">Sélectionner par rang</button>}{index===3&&<button onClick={async()=>await handleDeselectRange()} className="mini-btn danger" style={{width:"160px"}}>Désélectionner</button>}<div style={{position:"relative",marginLeft:"auto"}}><button onClick={()=>setOpenMenuId(openMenuId===c.id?null:c.id)} className="mini-btn" style={{padding:"4px 6px",background:"#16a34a",color:"#fff"}}><MoreVertical size={16}/></button>{openMenuId===c.id&&<div style={{position:"absolute",right:0,top:"26px",background:"#fff",border:"1px solid #ddd",borderRadius:"6px",boxShadow:"0 4px 10px rgba(0,0,0,0.12)",zIndex:9999}}><div onClick={()=>{setDetailCandidat(c);setOpenMenuId(null);}} style={{padding:"8px 12px",cursor:"pointer",fontSize:"13px"}}>Voir détail</div></div>}</div></>}</td>}
+                      {(view === "total" || view === "selectionnee") && <td style={{ whiteSpace: "nowrap", display: "flex", alignItems: "center", gap: "6px" }}>{view === "selectionnee" ? <button onClick={() => handleSendConvocation(c.id)} className="mini-btn blue">Envoyer convocation</button> : <>{index === 0 && <input type="text" placeholder="Filtrer par poste" value={posteSearch} onChange={e => { setPosteSearch(e.target.value); setFiltered(candidatures.filter(c => c.poste.toLowerCase().includes(e.target.value.toLowerCase()))) }} className="mini-input" />}{index === 1 && <input type="text" placeholder="1-100" value={rangeInput} onChange={e => setRangeInput(e.target.value)} className="mini-input" />}{index === 2 && <button onClick={handleAutoSelectRange} className="mini-btn success">Sélectionner par rang</button>}{index === 3 && <button onClick={async () => await handleDeselectRange()} className="mini-btn danger" style={{ width: "160px" }}>Désélectionner</button>}<div style={{ position: "relative", marginLeft: "auto" }}><button onClick={() => setOpenMenuId(openMenuId === c.id ? null : c.id)} className="mini-btn" style={{ padding: "4px 6px", background: "#16a34a", color: "#fff" }}><MoreVertical size={16} /></button>{openMenuId === c.id && <div style={{ position: "absolute", right: 0, top: "26px", background: "#fff", border: "1px solid #ddd", borderRadius: "6px", boxShadow: "0 4px 10px rgba(0,0,0,0.12)", zIndex: 9999 }}><div onClick={() => { setDetailCandidat(c); setOpenMenuId(null); }} style={{ padding: "8px 12px", cursor: "pointer", fontSize: "13px" }}>Voir détail</div></div>}</div></>}</td>}
 
                       {view === "fait_entretien" && (
                         <td>
@@ -380,14 +380,14 @@ const RHDashboard = () => {
                             disabled={employeeStatus[c.id]}
                           >
                             {employeeStatus[c.id] ? "Déjà employé" : "Employee"}
-                          </button> 
+                          </button>
                         </td>
                       )}
                     </tr>
                   ))}
                 </tbody>
               </table>
-              {detailCandidat && (<div style={{position:"fixed",inset:0,background:"rgba(0,0,0,0.4)",display:"flex",alignItems:"center",justifyContent:"center",zIndex:100}}><div style={{background:"#fff",padding:"20px",borderRadius:"10px",width:"450px",maxHeight:"80vh",overflowY:"auto"}}><div style={{display:"flex",justifyContent:"space-between",alignItems:"center"}}><h3>DÉTAIL DU CANDIDAT</h3><button onClick={()=>setDetailCandidat(null)}><X size={18}/></button></div><hr/><p><b>Nom & Prénom :</b> {detailCandidat.nom} {detailCandidat.prenom}</p><p><b>Poste demandé :</b> {detailCandidat.poste}</p><p><b>Email | Téléphone :</b> {detailCandidat.email ?? "—"} | {detailCandidat.phone ?? "—"}</p><p><b>Date de candidature :</b> {detailCandidat.date_candidature ? new Date(detailCandidat.date_candidature).toLocaleDateString() : "—"}</p><h4>STATUT RH</h4><p>{detailCandidat.statut}</p><h4>SCORE GLOBAL</h4><p>{detailCandidat.score_total ?? "—"} /100 – {detailCandidat.score_total >= 75 ? "Très bon profil" : detailCandidat.score_total >= 50 ? "Profil moyen" : "Profil faible"}</p></div></div>)}
+              {detailCandidat && (<div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.4)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 100 }}><div style={{ background: "#fff", padding: "20px", borderRadius: "10px", width: "450px", maxHeight: "80vh", overflowY: "auto" }}><div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}><h3>DÉTAIL DU CANDIDAT</h3><button onClick={() => setDetailCandidat(null)}><X size={18} /></button></div><hr /><p><b>Nom & Prénom :</b> {detailCandidat.nom} {detailCandidat.prenom}</p><p><b>Poste demandé :</b> {detailCandidat.poste}</p><p><b>Email | Téléphone :</b> {detailCandidat.email ?? "—"} | {detailCandidat.phone ?? "—"}</p><p><b>Date de candidature :</b> {detailCandidat.date_candidature ? new Date(detailCandidat.date_candidature).toLocaleDateString() : "—"}</p><h4>STATUT RH</h4><p>{detailCandidat.statut}</p><h4>SCORE GLOBAL</h4><p>{detailCandidat.score_total ?? "—"} /100 – {detailCandidat.score_total >= 75 ? "Très bon profil" : detailCandidat.score_total >= 50 ? "Profil moyen" : "Profil faible"}</p></div></div>)}
 
             </div>
           )}
@@ -398,18 +398,3 @@ const RHDashboard = () => {
 };
 
 export default RHDashboard;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

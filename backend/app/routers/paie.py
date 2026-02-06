@@ -1,3 +1,4 @@
+# backend/app/routers/paie.py
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session, joinedload
 from sqlalchemy import extract
@@ -78,14 +79,14 @@ def create_paie(data: PaieCreate, db: Session = Depends(get_db)):
         employee=employee,
         salaire_base=salaire_base,
         absence_deduction=absence_deduction,
-        salaire_net=salaire_net,
+        net_a_payer=salaire_net, 
         montant=salaire_net,
         primes=getattr(data, "primes", 0.0),
         heures_supp=getattr(data, "heures_supp", 0.0),
         deductions=getattr(data, "deductions", 0.0),
         mois=mois,
         annee=annee,
-        date_paie=today
+        date_paiement=date.today()
     )
 
     db.add(paie)

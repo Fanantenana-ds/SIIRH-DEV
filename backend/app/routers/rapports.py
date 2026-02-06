@@ -144,7 +144,8 @@ def rapport_paies(db: Session = Depends(get_db), export: str = Query(None)):
             "Salaire de base": p.salaire_base,
             "Primes": p.primes,
             "Déductions": (p.deductions or 0) + (p.absence_deduction or 0),
-            "Salaire net": p.salaire_net,
+            "Salaire net": p.net_a_payer,
+
         })
     if export == "excel":
         return export_excel(data, "rapport_paies.xlsx")

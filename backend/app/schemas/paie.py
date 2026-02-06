@@ -1,4 +1,78 @@
-from pydantic import BaseModel
+# from pydantic import BaseModel
+# from typing import Optional
+
+# # ------------------------
+# # Pour l'employé lié à la paie
+# # ------------------------
+# class EmployeeOut(BaseModel):
+#     id: int
+#     fullname: str  # Ataovy hoe efa manana property fullname ao amin'ny model Employee
+
+#     class Config:
+#         orm_mode = True
+
+# # ------------------------
+# # Base pour shared fields
+# # ------------------------
+# class PaieBase(BaseModel):
+#     employee_id: int
+#     salaire_base: Optional[float] = None
+#     primes: Optional[float] = 0.0
+#     heures_supp: Optional[float] = 0.0
+#     deductions: Optional[float] = 0.0
+#     absence_deduction: Optional[float] = 0.0
+#     salaire_net: Optional[float] = None
+#     montant: Optional[float] = None
+#     mois: str
+#     annee: int
+
+# # ------------------------
+# # Pour création
+# # ------------------------
+# class PaieCreate(PaieBase):
+#     pass
+
+# # ------------------------
+# # Pour mise à jour
+# # ------------------------
+# class PaieUpdate(BaseModel):
+#     salaire_base: Optional[float] = None
+#     primes: Optional[float] = None
+#     heures_supp: Optional[float] = None
+#     deductions: Optional[float] = None
+#     absence_deduction: Optional[float] = None
+#     salaire_net: Optional[float] = None
+#     montant: Optional[float] = None
+#     mois: Optional[str] = None
+#     annee: Optional[int] = None
+
+# # ------------------------
+# # Pour lecture (avec id et employé lié)
+# # ------------------------
+# class PaieOut(PaieBase):
+#     id: int
+#     employee: Optional[EmployeeOut]
+
+#     class Config:
+#         orm_mode = True
+
+
+
+
+# class PaieExportOut(BaseModel):
+#     employee_id: int
+#     nom: str
+#     prenom: str
+#     heures_normales: float
+#     heures_supplementaires: float
+#     absences_non_payees: int
+
+#     class Config:
+#         orm_mode = True
+
+
+
+from pydantic import BaseModel, Field
 from typing import Optional
 
 # ------------------------
@@ -6,25 +80,29 @@ from typing import Optional
 # ------------------------
 class EmployeeOut(BaseModel):
     id: int
-    fullname: str  # Ataovy hoe efa manana property fullname ao amin'ny model Employee
+    fullname: str  # Efa manana property fullname ao amin'ny model Employee
 
     class Config:
         orm_mode = True
 
 # ------------------------
-# Base pour shared fields
+# Base pour shared fields avec alias
 # ------------------------
 class PaieBase(BaseModel):
     employee_id: int
     salaire_base: Optional[float] = None
-    primes: Optional[float] = 0.0
+    prime: Optional[float] = Field(0.0, alias="primes")
     heures_supp: Optional[float] = 0.0
-    deductions: Optional[float] = 0.0
+    deduction: Optional[float] = Field(0.0, alias="deductions")
     absence_deduction: Optional[float] = 0.0
-    salaire_net: Optional[float] = None
-    montant: Optional[float] = None
+    net_a_payer: Optional[float] = Field(None, alias="salaire_net")
+    montant: Optional[float] = 0.0
     mois: str
     annee: int
+
+    class Config:
+        from_attributes = True  # pour Pydantic v2 compatibility
+        allow_population_by_field_name = True  # permet d'utiliser "primes" dans payload
 
 # ------------------------
 # Pour création
@@ -37,14 +115,18 @@ class PaieCreate(PaieBase):
 # ------------------------
 class PaieUpdate(BaseModel):
     salaire_base: Optional[float] = None
-    primes: Optional[float] = None
+    prime: Optional[float] = Field(None, alias="primes")
     heures_supp: Optional[float] = None
-    deductions: Optional[float] = None
+    deduction: Optional[float] = Field(None, alias="deductions")
     absence_deduction: Optional[float] = None
-    salaire_net: Optional[float] = None
+    net_a_payer: Optional[float] = Field(None, alias="salaire_net")
     montant: Optional[float] = None
     mois: Optional[str] = None
     annee: Optional[int] = None
+
+    class Config:
+        from_attributes = True
+        allow_population_by_field_name = True
 
 # ------------------------
 # Pour lecture (avec id et employé lié)
@@ -55,10 +137,11 @@ class PaieOut(PaieBase):
 
     class Config:
         orm_mode = True
+        from_attributes = True
 
-
-
-
+# ------------------------
+# Pour export CSV / Excel
+# ------------------------
 class PaieExportOut(BaseModel):
     employee_id: int
     nom: str

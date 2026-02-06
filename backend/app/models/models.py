@@ -18,35 +18,63 @@ class Candidature(Base):
     __table_args__ = {"extend_existing": True}
 
     id = Column(Integer, primary_key=True, index=True)
+
+    # 🔹 Identité candidat
+    nom = Column(String(100), nullable=False)
+    prenom = Column(String(150), nullable=False)
     fullname = Column(String(255), nullable=False)
+
+    # 🔹 Contact
     email = Column(String(255), nullable=False)
     telephone = Column(String(50), nullable=True)
     source = Column(String(100), nullable=True)
+
+    # 🔹 CV & parsing
     raw_cv_s3 = Column(Text, nullable=True)
     parsed_json = Column(JSON, nullable=True)
+
+    # 🔹 Scoring
     score = Column(Float, nullable=True)
     score_total = Column(Float, default=0)
-    score_breakdown = Column(JSON, default={})
+    score_breakdown = Column(JSON, default=dict)
+
+    # 🔹 Statut & offre
     statut = Column(String(50), default="nouveau")
     poste = Column(String(100), nullable=True)
-    offre_id = Column(Integer, ForeignKey("offres.id", ondelete="CASCADE"), nullable=False)
-    ref_offre = Column(String(100))
-    
-    # Champs NLP
+
+    offre_id = Column(
+        Integer,
+        ForeignKey("offres.id", ondelete="CASCADE"),
+        nullable=False
+    )
+    ref_offre = Column(String(100), nullable=True)
+
+    # 🔹 Champs NLP
     nlp_data = Column(JSON, nullable=True)
     competences = Column(Text, nullable=True)
     experience_years = Column(Integer, default=0)
     cv_text = Column(Text, nullable=True)
-    
-    # Dates
+
+    # 🔹 Dates
     date_candidature = Column(DateTime, default=datetime.utcnow)
-    date_maj = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    date_maj = Column(
+        DateTime,
+        default=datetime.utcnow,
+        onupdate=datetime.utcnow
+    )
 
-    # Relations
+    # 🔹 Relations
     offre = relationship("Offre", back_populates="candidatures")
-    convocations = relationship("Convocation", back_populates="candidature", cascade="all, delete-orphan")
-    employee = relationship("Employee", back_populates="candidature", uselist=False)
-
+    convocations = relationship(
+        "Convocation",
+        back_populates="candidature",
+        cascade="all, delete-orphan"
+    )
+    employee = relationship(
+        "Employee",
+        back_populates="candidature",
+        uselist=False
+    )
 
 # ==================== EMPLOYEE ====================
 class Employee(Base):
@@ -60,9 +88,11 @@ class Employee(Base):
     telephone = Column(String(20))
     poste = Column(String(100))
     salaire = Column(Float)
+    solde_conges = Column(Float, default=0)
     fullname = Column(String(255))
     candidature_id = Column(Integer, ForeignKey('candidatures.id'))
     date_embauche = Column(Date, default=date.today)
+    date_solde_update = Column(Date) # Date de la dernière mise à jour du solde de congés
     
     # ========== RELATIONS COMPLÈTES ==========
     candidature = relationship("Candidature", back_populates="employee", uselist=False)
@@ -71,7 +101,7 @@ class Employee(Base):
     paies = relationship("Paie", back_populates="employee", cascade="all, delete-orphan")
     conges = relationship("Conge", back_populates="employee", cascade="all, delete-orphan")
     pointages = relationship("Pointage", back_populates="employee", cascade="all, delete-orphan")
-    
+   
     def __repr__(self):
         return f"<Employee {self.id}: {self.nom} {self.prenom}>"
 

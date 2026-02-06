@@ -384,7 +384,7 @@ def get_case(case_id: int, db: Session = Depends(get_db)):
 
     last_decision_event = crud.get_last_event_of_type(db, case_id, "decision")
     if last_decision_event:
-        decision_data = json.loads(last_decision_event.event_data)
+        decision_data = json.loads(last_decision_event.description)
         case.decision = {
             "decision_type": decision_data.get("type", ""),
             "decision_notes": decision_data.get("notes", "")
