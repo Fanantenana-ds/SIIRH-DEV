@@ -1,94 +1,5 @@
-/* .liste-entretien-container {
-  max-width: 1100px;
-  margin: 40px auto;
-  padding: 30px;
-  background: #f5f1f1;
-  color: #f1f1f1;
-  border-radius: 18px;
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.6);
-  font-family: "Poppins", sans-serif;
-}
-
-.liste-entretien-container h2 {
-  text-align: center;
-  margin-bottom: 25px;
-  color: #51d845;
-  font-weight: 600;
-}
-
-.entretien-table {
-  width: 100%;
-  border-collapse: collapse;
-  background: #1b1b1b;
-  border-radius: 12px;
-  overflow: hidden;
-}
-
-.entretien-table th,
-.entretien-table td {
-  padding: 12px 14px;
-  text-align: left;
-  border-bottom: 1px solid #2a2a2a;
-}
-
-.entretien-table th {
-  background: #222;
-  color: #ffdb70;
-  font-weight: 600;
-}
-
-.entretien-table tr:hover {
-  background: #1f1f1f;
-  transition: 0.2s;
-}
-
-.score-cell {
-  position: relative;
-  width: 140px;
-}
-
-.score-value {
-  font-weight: bold;
-  color: #ffb400;
-}
-
-.score-bar {
-  width: 100%;
-  height: 6px;
-  background: #333;
-  border-radius: 4px;
-  overflow: hidden;
-  margin-top: 5px;
-}
-
-.score-fill {
-  height: 100%;
-  background: linear-gradient(90deg, #ffb400, #ffdb70);
-  transition: width 0.5s ease;
-}
-
-.decision {
-  font-weight: bold;
-  text-align: center;
-  border-radius: 6px;
-  padding: 5px 8px;
-}
-
-.decision.go {
-  color: #00d47e;
-}
-
-.decision.hold {
-  color: #ffc107;
-}
-
-.decision.nogo {
-  color: #ff5252;
-} */
-
-
 .dashboard-container {
-  padding: 10px 20px 20px 20px; /* ambony kely mba hifanaraka amin'ny sidebar */
+  padding: 10px 20px 20px 20px;
   font-family: 'Arial', sans-serif;
 }
 
@@ -104,7 +15,7 @@
   display: inline-block;
   padding: 18px 35px;
   border-radius: 10px;
-  font-size: 32px; /* nampitomboina kely ny haben’ny titre */
+  font-size: 32px;
   font-weight: bold;
   margin-bottom: 15px;
 }
@@ -120,7 +31,7 @@
 
 .dashboard-search input {
   width: 60%;
-  padding: 12px 15px 12px 45px; /* place pour l’icône à gauche */
+  padding: 12px 15px 12px 45px;
   border-radius: 8px;
   border: 1px solid #ccc;
   font-size: 16px;
@@ -130,7 +41,7 @@
 
 .dashboard-search-icon {
   position: absolute;
-  left: calc(20% + 12px); /* positionne l’icône à gauche du champ */
+  left: calc(20% + 12px);
   color: #555;
   pointer-events: none;
   background: white;

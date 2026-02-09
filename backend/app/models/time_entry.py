@@ -1,4 +1,3 @@
-# FILE: app/models/time_entry.py
 from sqlalchemy import Column, Integer, Date, Time, ForeignKey
 from sqlalchemy.orm import relationship
 from app.db import Base

@@ -1,7 +1,3 @@
-
-
-
-# app/services/upload_service.py - VERSION CORRIGÉE COMPLÈTE
 import os, io, logging, re
 from datetime import datetime
 from typing import Optional, Dict, Any, List, Tuple

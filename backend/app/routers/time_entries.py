@@ -1,4 +1,3 @@
-# FILE: app/routers/time_entries.py
 from fastapi import APIRouter, UploadFile, File, Depends, HTTPException
 from sqlalchemy.orm import Session
 from app.db import get_db

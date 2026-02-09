@@ -280,11 +280,11 @@ const RHDashboard = () => {
                 boxSizing: "border-box",
                 transition: "0.2s",
               }}
-              onMouseOver={e => e.currentTarget.style.transform = "scale(1.03)"}
+              onMouseOver={e => e.currentTarget.style.tcd.ransform = "scale(1.03)"}
               onMouseOut={e => e.currentTarget.style.transform = "scale(1)"}
             >
               <div style={{ display: "flex", justifyContent: "space-between", width: "100%", alignItems: "center" }}>
-                <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
+                <div style={{ display: "flex", flexDirection: "column", gap: "4p" }}>
                   <div style={{ marginBottom: "2px" }}>{item.icon}</div>
                   <span style={{ fontSize: "14px", fontWeight: "600", marginTop: "-1px" }}>{item.label}</span>
                 </div>
@@ -319,7 +319,7 @@ const RHDashboard = () => {
                     <th>Nom</th>
                     <th>Prénom</th>
                     <th>Poste</th>
-                    {view === "employees" && <><th>Email</th><th>Tél</th></>}
+                    {view === "employees" && <><th>Email</th></>}
                     {view !== "employees" && <><th>{view === "convoque" ? "DATE ET HEURE" : "DATE"}</th><th>Score</th><th>Décision</th></>}
                     {(view === "total" || view === "selectionnee") && <th>Action</th>}
                     {view === "fait_entretien" && <th>Action</th>}

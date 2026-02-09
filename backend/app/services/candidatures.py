@@ -1,5 +1,5 @@
 from sqlalchemy.orm import Session
-from app.models import Candidature  # Ataovy azo antoka fa misy model Candidature
+from app.models import Candidature  
 from app.schemas import CandidatureResponse
 
 def create_candidature(db: Session, data: dict) -> CandidatureResponse:

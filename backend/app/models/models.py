@@ -1,6 +1,3 @@
-
-
-# app/models/models.py - VERSION COMPLÈTE
 from sqlalchemy import Column, Integer, String, Float, ForeignKey, Text, JSON, DateTime, Date, Time,Boolean
 from sqlalchemy.orm import relationship
 from app.db import Base

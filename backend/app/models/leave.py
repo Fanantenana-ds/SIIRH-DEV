@@ -1,4 +1,3 @@
-# FILE: app/models/leave.py
 from sqlalchemy import Column, Integer, String, Date, ForeignKey
 from sqlalchemy.orm import relationship
 from app.db import Base

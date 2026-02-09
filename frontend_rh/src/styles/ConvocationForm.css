@@ -1,4 +1,3 @@
-/* Container lehibe */
 .convocation-container {
   width: 400px;
   margin: 50px auto;
@@ -45,7 +44,6 @@
   font-style: italic;
 }
 
-/* Input rehefa mifantoka */
 .convocation-form input:focus {
   border-color: #0055cc;
   box-shadow: 0 0 5px rgba(0, 85, 204, 0.5);
@@ -65,7 +63,6 @@
   transition: background 0.3s, transform 0.2s;
 }
 
-/* Bouton rehefa hover */
 .convocation-form button:hover {
   background: #0044aa;
   transform: translateY(-2px);
@@ -79,17 +76,14 @@
   color: #333;
 }
 
-/* Icon alohan’ny message */
 .status-message::before {
   content: "ℹ️ ";
   margin-right: 5px;
 }
 
-/* Responsive kely raha ny écran kely */
 @media (max-width: 450px) {
   .convocation-container {
     width: 90%;
     padding: 20px;
   }
 }
-

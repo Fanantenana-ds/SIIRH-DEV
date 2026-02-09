@@ -72,7 +72,7 @@ def delete_pointage(ptg_id: int, db: Session = Depends(get_db)):
 
 
 # ===============================
-# 🚀 NOUVELLE ROUTE PRO (RÉSUMÉ)
+# 🚀 NOUVELLE ROUTE
 # ===============================
 
 @router.get("/resume", response_model=List[PointageResume])
@@ -84,7 +84,7 @@ def pointage_resume(
     employees = db.query(Employee).all()
     results = []
 
-    JOURS_THEORIQUES = 30  # mensuel standard (modifiable plus tard)
+    JOURS_THEORIQUES = 30  
 
     for emp in employees:
         pts = db.query(Pointage).filter(

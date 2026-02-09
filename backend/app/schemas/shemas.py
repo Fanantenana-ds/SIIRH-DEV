@@ -7,7 +7,7 @@ from typing import Optional
 # =====================
 class AbsenceBase(BaseModel):
     employee_id: int
-    type_absence: str       # mifanaraka amin'ny frontend React
+    type_absence: str       
     date_debut: date
     date_fin: date
     motif: Optional[str] = ""
@@ -37,7 +37,7 @@ class AbsenceRead(AbsenceBase):
     id: int
 
     class Config:
-        from_attributes = True  # Pydantic v2, mba tsy hiseho ny warning
+        from_attributes = True  
 # =====================
 # 🔹 Schema base Conge
 # =====================

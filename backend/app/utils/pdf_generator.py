@@ -1,4 +1,3 @@
-# backend/app/utils/pdf_generator.py - VERSION CORRIGÉE
 from fpdf import FPDF
 from datetime import datetime
 import os

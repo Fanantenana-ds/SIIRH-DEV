@@ -1,12 +1,15 @@
-
-/* === Style global an'ny App === */
 body {
-  background-color: #f9fafb; /* Gray-50 manara-penitra */
-  color: #1f2937; /* Gray-800 */
+  background-color: #f9fafb;
+  /* Gray-50 manara-penitra */
+  color: #1f2937;
+  /* Gray-800 */
   font-family: 'Inter', sans-serif;
 }
 
-h1, h2, h3, h4 {
+h1,
+h2,
+h3,
+h4 {
   font-weight: 600;
 }
 
@@ -43,5 +46,3 @@ h1, h2, h3, h4 {
 .theme-btn:hover {
   background-color: #e5e7eb;
 }
-
-

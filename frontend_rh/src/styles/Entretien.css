@@ -1,108 +1,111 @@
 /* Container principale */
 .entretien-container {
-max-width: 850px;
-margin: 40px auto;
-background: #ffffff; /* container fotsy professional */
-color: #1a1a1a;      /* soratra mainty */
-padding: 40px;
-border-radius: 20px;
-box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15); /* shadow maivana professional */
-font-family: "Poppins", sans-serif;
-transition: background 0.3s, color 0.3s;
+    max-width: 850px;
+    margin: 40px auto;
+    background: #ffffff;
+    color: #1a1a1a;
+    padding: 40px;
+    border-radius: 20px;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+    font-family: "Poppins", sans-serif;
+    transition: background 0.3s, color 0.3s;
 }
 
 /* Titre principal */
 .entretien-container h2 {
-text-align: center;      /* afovoany */
-margin-bottom: 30px;
-color: #4bc97b;          /* maitso tsy ovaina */
-font-weight: 600;
-font-size: 28px;
+    text-align: center;
+    margin-bottom: 30px;
+    color: #4bc97b;
+    font-weight: 600;
+    font-size: 28px;
 }
 
 /* Titres sections h3 */
 .entretien-container h3 {
-color: #1a1a1a;  /* soratra mainty */
-margin-top: 25px;
-margin-bottom: 10px;
-font-weight: 500;
+    color: #1a1a1a;
+    margin-top: 25px;
+    margin-bottom: 10px;
+    font-weight: 500;
 }
 
 /* Labels */
 .entretien-form label {
-display: block;
-margin-top: 10px;
-color: #1a1a1a; /* soratra mainty */
-font-weight: 500;
+    display: block;
+    margin-top: 10px;
+    color: #1a1a1a;
+    font-weight: 500;
 }
 
 /* Inputs, selects, textarea */
 .entretien-form input,
 .entretien-form select,
 .entretien-form textarea {
-width: 100%;
-padding: 10px 14px;
-margin-top: 5px;
-border: 1px solid #d0d0d0; /* border maivana */
-border-radius: 8px;
-background: #f5f5f5;        /* fotsy/mavo kely */
-color: #1a1a1a;             /* soratra mainty */
-font-size: 15px;
-transition: 0.3s all;
+    width: 100%;
+    padding: 10px 14px;
+    margin-top: 5px;
+    border: 1px solid #d0d0d0;
+    border-radius: 8px;
+    background: #f5f5f5;
+    color: #1a1a1a;
+    font-size: 15px;
+    transition: 0.3s all;
 }
 
 /* Placeholder */
 .entretien-form input::placeholder,
 .entretien-form textarea::placeholder {
-color: #7a7a7a; /* grey matotra */
+    color: #7a7a7a;
 }
 
 /* Focus state */
 .entretien-form input:focus,
 .entretien-form textarea:focus,
 .entretien-form select:focus {
-outline: 2px solid #3086e1; /* accent professional bleu */
-background: #ffffff;
+    outline: 2px solid #3086e1;
+    background: #ffffff;
 }
 
 /* Criteria section */
 .criteria-section {
-display: grid;
-grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-gap: 15px;
-margin-bottom: 20px;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 15px;
+    margin-bottom: 20px;
 }
 
 /* Submit button */
 .submit-btn {
-margin-top: 25px;
-width: 100%;
-padding: 14px;
-background: linear-gradient(90deg, #3086e1, #1647db); /* bleu professional */
-color: #ffffff;
-font-weight: 600;
-font-size: 16px;
-border: none;
-border-radius: 12px;
-cursor: pointer;
-transition: 0.3s all;
+    margin-top: 25px;
+    width: 100%;
+    padding: 14px;
+    background: linear-gradient(90deg, #3086e1, #1647db);
+    color: #ffffff;
+    font-weight: 600;
+    font-size: 16px;
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: 0.3s all;
 }
 
 .submit-btn:hover {
-background: linear-gradient(90deg, #55aaff, #0d3caa); /* hover pro */
-transform: scale(1.02);
+    background: linear-gradient(90deg, #55aaff, #0d3caa);
+    /* hover pro */
+    transform: scale(1.02);
 }
 
 /* Responsive adjustments */
 @media (max-width: 500px) {
-.entretien-container {
-padding: 25px;
-}
-.entretien-container h2 {
-font-size: 24px;
-}
-.submit-btn {
-font-size: 15px;
-padding: 12px;
-}
+    .entretien-container {
+        padding: 25px;
+    }
+
+    .entretien-container h2 {
+        font-size: 24px;
+    }
+
+    .submit-btn {
+        font-size: 15px;
+        padding: 12px;
+    }
 }

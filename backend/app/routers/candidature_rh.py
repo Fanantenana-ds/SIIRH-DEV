@@ -1,6 +1,3 @@
-
-
-# app/routers/candidature_rh.py
 from fastapi import APIRouter, HTTPException, Depends
 from sqlalchemy.orm import Session
 from app.db import get_db, engine
@@ -38,7 +35,7 @@ async def get_candidatures():
                 c.nom,
                 c.prenom,
                 c.email,
-                c.phone,
+                c.telephone,
                 c.adresse,
                 c.date_naissance,
                 c.poste,
@@ -75,7 +72,7 @@ async def get_candidatures():
                 conv.heure_entretien,
                 conv.interval_minute,
                 conv.lieu_entretien,
-                c.phone AS telephone_candidat,
+                c.telephone AS telephone_candidat,
                 e.telephone AS telephone_employe
             FROM candidatures c
             LEFT JOIN offres o 

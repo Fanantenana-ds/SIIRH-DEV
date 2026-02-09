@@ -1,4 +1,3 @@
-# backend/app/routers/paie.py
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session, joinedload
 from sqlalchemy import extract
@@ -69,7 +68,7 @@ def create_paie(data: PaieCreate, db: Session = Depends(get_db)):
     # Détermination automatique du mois et de l'année si manquants
     # ------------------------
     today = date.today()
-    mois = getattr(data, "mois", None) or today.strftime("%B")  # ex: "Novembre"
+    mois = getattr(data, "mois", None) or today.strftime("%B")  
     annee = getattr(data, "annee", None) or today.year
 
     salaire_base, absence_deduction, salaire_net = compute_paie(employee, mois, annee, db)

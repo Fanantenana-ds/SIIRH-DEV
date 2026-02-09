@@ -1,4 +1,3 @@
-# FILE: app/schemas/time_entry.py
 from pydantic import BaseModel
 from datetime import date, time
 

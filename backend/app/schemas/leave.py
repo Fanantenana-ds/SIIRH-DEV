@@ -7,7 +7,7 @@ from datetime import date
 # ======================
 class LeaveCreate(BaseModel):
     employee_id: int
-    type_conge: str               # frontend → backend mapping (type_conge)
+    type_conge: str               
     date_debut: date
     date_fin: date
     motif: str | None = None
@@ -17,7 +17,7 @@ class LeaveCreate(BaseModel):
 #   UPDATE
 # ======================
 class LeaveUpdate(BaseModel):
-    type_conge: str | None = None    # mbola type_conge no raisina → ovaina ho type ao backend
+    type_conge: str | None = None   
     date_debut: date | None = None
     date_fin: date | None = None
     motif: str | None = None
@@ -32,7 +32,7 @@ class LeaveOut(BaseModel):
     employee_id: int
     date_debut: date
     date_fin: date
-    type: str                     # 🚀 tsy alias, mivantana avy amin'ny DB
+    type: str                     
     motif: str | None = None
     statut: str
 

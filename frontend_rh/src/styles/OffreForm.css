@@ -13,7 +13,8 @@
 .offre-form-container h2 {
   font-size: 2rem;
   font-weight: 700;
-  color: #065f46; /* vert SIIRH */
+  color: #065f46;
+  /* vert SIIRH */
   margin-bottom: 2rem;
   text-align: center;
 }
@@ -22,7 +23,8 @@
 .offre-form-container h3 {
   font-size: 1.2rem;
   font-weight: 600;
-  color: #047857; /* vert foncé */
+  color: #047857;
+  /* vert foncé */
   margin-top: 2rem;
   margin-bottom: 1rem;
   border-bottom: 2px solid #d1fae5;
@@ -33,8 +35,10 @@
 .form-field {
   display: flex;
   flex-direction: column;
-  gap: 0.25rem;       /* elanelana eo label sy input */
-  margin-bottom: 1rem; /* elanelana eo champs tsirairay */
+  gap: 0.25rem;
+  /* elanelana eo label sy input */
+  margin-bottom: 1rem;
+  /* elanelana eo champs tsirairay */
   width: 100%;
 }
 
@@ -49,7 +53,8 @@
   font-size: 0.95rem;
   background-color: #f9fafb;
   transition: all 0.2s;
-  box-sizing: border-box; /* hahazo width uniforme */
+  box-sizing: border-box;
+  /* hahazo width uniforme */
 }
 
 /* Focus */
@@ -57,7 +62,8 @@
 .offre-form-container textarea:focus,
 .offre-form-container select:focus {
   outline: none;
-  border-color: #10b981; /* vert focus */
+  border-color: #10b981;
+  /* vert focus */
   box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.2);
   background-color: #ffffff;
 }
@@ -73,7 +79,6 @@ input[type="date"] {
   margin-top: 0.5rem;
 }
 
-/* Select input: elanelana ambany ambony mba tsy mifampipetaka amin'ny date */
 select[name="contract_type"] {
   margin-bottom: 0.5rem;
 }
@@ -99,7 +104,7 @@ input[type="range"]::-webkit-slider-thumb {
   border-radius: 50%;
   background: #10b981;
   cursor: pointer;
-  box-shadow: 0 0 2px rgba(0,0,0,0.3);
+  box-shadow: 0 0 2px rgba(0, 0, 0, 0.3);
   transition: all 0.2s;
 }
 
@@ -114,7 +119,7 @@ input[type="range"]::-moz-range-thumb {
   border-radius: 50%;
   background: #10b981;
   cursor: pointer;
-  box-shadow: 0 0 2px rgba(0,0,0,0.3);
+  box-shadow: 0 0 2px rgba(0, 0, 0, 0.3);
   transition: all 0.2s;
 }
 
@@ -153,6 +158,7 @@ input[type="range"]::-moz-range-thumb {
   .offre-form-container form {
     grid-template-columns: 1fr !important;
   }
+
   .scoring-container {
     grid-template-columns: 1fr !important;
   }
@@ -171,19 +177,19 @@ input[type="range"]::-moz-range-thumb {
 
 /* Bouton Annuler */
 button.ml-auto.bg-red-600 {
-  background-color: #dc2626; /* Mena mazava */
+  background-color: #dc2626;
   color: #fff;
   transition: background-color 0.3s;
 }
 
 button.ml-auto.bg-red-600:hover {
-  background-color: #b91c1c; /* Mena maizina rehefa hover */
+  background-color: #b91c1c;
 }
 
 /* Input Filtrer par poste */
 input[placeholder="Filtrer par poste"] {
-  margin-top: 8px; /* kely ambany an'ilay bouton */
-  text-align: center; /* placeholder ao afovoany */
+  margin-top: 8px;
+  text-align: center;
   padding: 8px 12px;
   border: 1px solid #d1d5db;
   border-radius: 0.75rem;
@@ -194,25 +200,23 @@ input[placeholder="Filtrer par poste"] {
   margin-right: auto;
 }
 
-/* Placeholder style */
 input[placeholder="Filtrer par poste"]::placeholder {
   text-align: center;
-  color: #6b7280; /* gris clair */
+  color: #6b7280;
 }
 
-/* Table: ambony kely ny marge */
 table {
   margin-top: 12px;
   border-collapse: separate;
-  border-spacing: 0 6px; /* espace kely eo ambanin'ny row */
+  border-spacing: 0 6px;
 }
 
-/* Colonne tête: background + texte */
 table thead tr {
   border-radius: 0.5rem;
 }
 
-table th, table td {
+table th,
+table td {
   padding: 8px 12px;
   text-align: left;
 }

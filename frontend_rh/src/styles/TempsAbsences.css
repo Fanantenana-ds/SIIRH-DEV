@@ -1,12 +1,3 @@
-/* === Page absences / Temps & Absences === */
-.temps-absences-page {
-  padding: 20px;
-  font-family: Arial, sans-serif;
-  background: #f9f9f9;
-  min-height: 100vh;
-}
-
-/* === Header === */
 .header {
   display: flex;
   flex-direction: column;
@@ -44,7 +35,7 @@
   padding: 15px;
   margin: 15px 0;
   border-radius: 6px;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
   display: flex;
   flex-direction: column;
   gap: 10px;
@@ -118,7 +109,8 @@
 }
 
 .tab-content table th {
-  background-color: #1e7e34; /* vert foncé entête */
+  background-color: #1e7e34;
+  /* vert foncé entête */
   color: #fff;
 }
 
@@ -138,7 +130,8 @@
 }
 
 .tab-content table td button:first-child {
-  background: #ffc107; /* éditer */
+  background: #ffc107;
+  /* éditer */
   color: #fff;
 }
 
@@ -147,7 +140,8 @@
 }
 
 .tab-content table td button:nth-child(2) {
-  background: #dc3545; /* supprimer */
+  background: #dc3545;
+  /* supprimer */
   color: #fff;
 }
 
@@ -156,7 +150,8 @@
 }
 
 .tab-content table td button:last-child {
-  background-color: #28a745; /* détails popup */
+  background-color: #28a745;
+  /* détails popup */
   color: #fff;
 }
 
@@ -192,7 +187,7 @@
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(0,0,0,0.5);
+  background: rgba(0, 0, 0, 0.5);
   display: flex;
   justify-content: center;
   align-items: center;
@@ -205,12 +200,13 @@
   border-radius: 6px;
   width: 90%;
   max-width: 500px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
 }
 
 .popup-content h3 {
   margin-top: 0;
-  color: #1e7e34; /* vert foncé */
+  color: #1e7e34;
+  /* vert foncé */
 }
 
 .popup-content button {
