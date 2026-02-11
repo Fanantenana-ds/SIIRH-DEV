@@ -1,0 +1,25 @@
+# ==== Stage 1 : Build ====
+FROM python:3.11-slim AS build
+
+WORKDIR /app
+
+# Install dependencies
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+# ==== Stage 2 : Run ====
+FROM python:3.11-slim
+
+WORKDIR /app
+
+# Copy dependencies from build
+COPY --from=build /usr/local/lib/python3.11 /usr/local/lib/python3.11
+
+# Copy application files
+COPY app ./app
+
+# Expose port
+EXPOSE 8000
+
+# Run app with uvicorn (no reload in production)
+CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]

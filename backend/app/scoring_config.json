@@ -1,0 +1,13 @@
+{
+  "Developpeur Python": {
+    "competences": ["Python", "FastAPI", "SQL", "Docker", "Machine Learning"],
+    "experience_min": 3,
+    "diplome_requis": "Master Informatique",
+    "poids": {
+      "competences": 0.4,
+      "experience": 0.3,
+      "formation": 0.2,
+      "projets": 0.1
+    }
+  }
+}

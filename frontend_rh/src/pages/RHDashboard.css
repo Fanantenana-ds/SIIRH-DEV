@@ -1,0 +1,638 @@
+/* ==== CSS efa napetraka efa misy ==== */
+/* Tsy ovaina ny ankamaroany, ampiana fotsiny fanatsarana kely ho an'ny boutons sy actions */
+
+/* Tableau des candidatures */
+.liste-entretien-container {
+  overflow-x: auto;
+}
+
+.entretien-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.entretien-table th,
+.entretien-table td {
+  padding: 10px;
+  text-align: left;
+  border-bottom: 1px solid #ddd;
+}
+
+/* Statuts */
+.decision.go {
+  color: #22c55e;
+  font-weight: bold;
+}
+.decision.nogo {
+  color: #dc2626;
+  font-weight: bold;
+}
+.decision.hold {
+  color: #eab308;
+  font-weight: bold;
+}
+
+/* ---- Actions cell ---- */
+.actions-cell.center {
+  display: flex;
+  justify-content: center;
+  gap: 8px; /* elanelana kely eo amin'ny boutons */
+}
+
+/* Mini buttons (Sélectionner, Refuser, Envoyer la convocation) */
+.mini-btn {
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  cursor: pointer;
+  border: none;
+  color: white;
+  transition: transform 0.15s, background 0.2s;
+}
+
+.mini-btn:hover {
+  transform: scale(1.05);
+}
+
+/* Boutons spécifiques */
+.mini-btn.success {
+  background-color: #28a745;
+}
+.mini-btn.success:hover {
+  background-color: #218838;
+}
+
+.mini-btn.danger {
+  background-color: #dc2626;
+}
+.mini-btn.danger:hover {
+  background-color: #c82333;
+}
+
+.mini-btn.blue {
+  background-color: #1e90ff;
+}
+.mini-btn.blue:hover {
+  background-color: #187bcd;
+}
+
+/* Convocation loading state */
+.mini-btn.loading {
+  opacity: 0.7;
+  pointer-events: none;
+}
+
+/* Tableau cards */
+.dashboard-card {
+  background-color: #fff;
+  border-radius: 10px;
+  padding: 10px 2px;
+  width: 100%;
+  max-width: 260px;
+  text-align: center;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+  transition: transform 0.2s, box-shadow 0.2s;
+  cursor: pointer;
+  border-top: 4px solid #4bc97b;
+}
+
+.dashboard-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+}
+
+.card-icon {
+  width: 55px;
+  height: 55px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 15px auto;
+}
+
+.card-value {
+  font-size: 2.2rem;
+  font-weight: 700;
+  color: #111;
+}
+
+.card-label {
+  font-size: 1rem;
+  color: #555;
+  margin-top: 4px;
+}
+
+/* Header & search */
+.dashboard-header {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.dashboard-title {
+  display: flex;
+  align-items: center;
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #1E90FF;
+}
+
+.dashboard-title-icon {
+  margin-right: 1cm;
+  width: 32px;
+  height: 32px;
+  color: #4a8c64;
+  position: relative;
+  top: 5px;
+}
+
+.dashboard-search {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 10px;
+  position: relative;
+}
+
+.dashboard-search input {
+  width: 60%;
+  padding: 12px 15px 12px 50px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  font-size: 16px;
+}
+
+.dashboard-search-icon {
+  position: absolute;
+  left: calc(50% - 30%);
+  top: 50%;
+  transform: translateY(-50%);
+  color: #555;
+  font-size: 18px;
+  pointer-events: none;
+  background-color: #eee;
+  padding: 6px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  top: 20px;
+}
+
+/* Back button */
+.back-btn {
+  background:  #1e90ff;
+  padding: 8px 14px;
+  border-radius: 8px;
+  transition: 0.2s;
+}
+.back-btn:hover {
+  background:#187bcd;;
+}
+
+/* ===== Boutons tableau inline ==== */
+/* Colone Action ao amin'ny total sy selectionnée */
+.actions-cell.center {
+  display: flex;
+  justify-content: center;
+  gap: 6px; /* kely mba tsy mirazotra */
+}
+
+/* Pour les boutons Sélectionner / Refuser / Convocation */
+.selection-btn, .refuse-btn, .convocation-btn {
+  padding: 5px 10px;
+  font-size: 0.8rem;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: transform 0.15s, background-color 0.2s;
+}
+
+.selection-btn:hover {
+  transform: scale(1.05);
+  background-color: #218838;
+}
+
+.refuse-btn:hover {
+  transform: scale(1.05);
+  background-color: #c82333;
+}
+
+.convocation-btn:hover {
+  transform: scale(1.05);
+  background-color: #187bcd;
+}
+
+
+
+
+
+
+
+
+/* ==== Dashboard cards - vue d'ensemble ==== */
+.dashboard-cards {
+  display: flex; /* flex horizontal */
+  flex-wrap: wrap; /* raha écran kely dia midina rehefa tsy misy espace */
+  justify-content: center; /* afovoany */
+  gap: 25px; /* elanelana eo amin'ny cards */
+}
+
+/* ==== Action buttons ao amin'ny tableau ==== */
+.actions-cell.center {
+  display: flex; /* mifanila horizontal */
+  justify-content: center;
+  gap: 6px; /* elanelana eo amin'ny boutons */
+}
+
+/* Mini boutons tableau */
+.mini-btn {
+  padding: 5px 10px;
+  font-size: 0.8rem;
+  border-radius: 6px;
+  cursor: pointer;
+  border: none;
+  color: white;
+  transition: transform 0.15s, background 0.2s;
+}
+
+.mini-btn:hover {
+  transform: scale(1.05);
+}
+
+/* Sélectionner / Refuser / Envoyer convocation */
+.mini-btn.success {
+  background-color: #28a745;
+}
+.mini-btn.success:hover {
+  background-color: #218838;
+}
+
+.mini-btn.danger {
+  background-color: #dc2626;
+}
+.mini-btn.danger:hover {
+  background-color: #c82333;
+}
+
+.mini-btn.blue {
+  background-color: #1e90ff;
+}
+.mini-btn.blue:hover {
+  background-color: #187bcd;
+}
+
+/* Convocation loading state */
+.mini-btn.loading {
+  opacity: 0.7;
+  pointer-events: none;
+}
+
+
+
+
+
+
+
+/* === Filtre poste + sélection par rang === */
+.selection-filters {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+}
+
+.selection-filters input[type="text"] {
+  padding: 6px 10px;
+  font-size: 14px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+}
+
+.selection-filters input[type="text"]:first-child {
+  width: 140px; /* poste */
+}
+
+.selection-filters input[type="text"]:last-child {
+  width: 80px; /* rang */
+  text-align: center;
+}
+
+.selection-filters .mini-btn {
+  margin-top: 0;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+}
+
+/* === Cloche notification === */
+.dashboard-header .notification-wrapper {
+  position: relative;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+}
+
+.dashboard-header .notification-wrapper span {
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  background: red;
+  color: white;
+  border-radius: 50%;
+  width: 16px;
+  height: 16px;
+  font-size: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.dashboard-header .topbar-controls {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* Atsahatra ny fivalozana rehefa kely ny écran */
+@media (max-width: 640px) {
+  .selection-filters {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .selection-filters input[type="text"] {
+    width: 100%;
+  }
+
+  .selection-filters .mini-btn {
+    width: 100%;
+  }
+
+  .dashboard-header {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .dashboard-header .topbar-controls {
+    justify-content: flex-end;
+    width: 100%;
+  }
+}
+
+
+
+/* Bouton Retour à la vue d’ensemble */
+.back-btn {
+  background-color: #1E90FF;
+  border: 1px solid #ccc;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 14px;
+  cursor: pointer;
+  margin-bottom: 10px;
+  transition: 0.2s;
+}
+
+.back-btn:hover {
+  background-color: #e0e0e0;
+}
+
+/* Bouton + Créer Contrat */
+.create-contrat-btn {
+  background-color: #1E90FF;
+  color: #fff;
+  padding: 6px 12px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: 0.2s;
+}
+
+.create-contrat-btn:hover {
+  background-color: #187bcd;
+}
+
+/* Table filtrable */
+.filterable-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 20px;
+}
+
+.filterable-table th,
+.filterable-table td {
+  border: 1px solid #ddd;
+  padding: 8px;
+  font-size: 13px;
+  text-align: left;
+}
+
+.filterable-table th {
+  background-color: #f8f8f8;
+  font-weight: 600;
+}
+
+.filterable-table tr:nth-child(even) {
+  background-color: #fafafa;
+}
+
+.filterable-table tr:hover {
+  background-color: #f1f1f1;
+}
+
+/* Input deselection par rang */
+.filterable-table + div input[type="text"] {
+  padding: 4px 8px;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+  font-size: 13px;
+  width: 80px;
+  margin-right: 6px;
+}
+
+.filterable-table + div button {
+  padding: 5px 10px;
+  border-radius: 4px;
+  border: none;
+  background-color: #28a745;
+  color: white;
+  cursor: pointer;
+  font-size: 13px;
+  transition: 0.2s;
+}
+
+.filterable-table + div button:hover {
+  background-color: #218838;
+}
+
+/* Titre tableau */
+.table-title {
+  font-size: 16px;
+  font-weight: bold;
+  margin-bottom: 8px;
+}
+
+/* Contrat form modal styling (already exists, optional) */
+
+
+
+
+
+
+
+
+
+/* Bouton Annuler (mena) */
+.btn-cancel {
+  background-color: #dc3545;
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  font-size: 14px;
+}
+
+.btn-cancel:hover {
+  background-color: #b02a37;
+}
+
+/* Bouton Enregistrer (manga, mitovy style) */
+.btn-save {
+  background-color: #1E90FF;
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  font-size: 14px;
+}
+
+.btn-save:hover {
+  background-color: #187bcd;
+}
+
+
+
+
+
+
+
+/* ====== WRAPPER PRINCIPAL ====== */
+.header-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 20px;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0px 2px 6px rgba(0,0,0,0.12);
+    margin-bottom: 18px;
+}
+
+/* ====== TITRE PRINCIPAL ====== */
+.header-title {
+    font-size: 22px;
+    font-weight: 600;
+    color: #333;
+    margin: 0;
+}
+
+/* ====== CONTAINER ICONES DROITE ====== */
+.header-icons {
+    display: flex;
+    align-items: center;
+    gap: 22px;
+}
+
+/* ====== ICONE NOTIFICATION ====== */
+.noti-icon-wrapper {
+    position: relative;
+    cursor: pointer;
+}
+
+.noti-icon {
+    font-size: 28px;
+    color: #444;
+}
+
+/* ====== BADGE ROUGE NOMBRE ====== */
+.noti-count {
+    position: absolute;
+    top: -6px;
+    right: -8px;
+    background: red;
+    color: white;
+    font-size: 11px;
+    font-weight: bold;
+    width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+}
+
+/* ====== ICONE RÔLE (HOMME/FEMME) ====== */
+.role-icon {
+    font-size: 31px;
+    color: #444;
+}
+
+/* ====== ICONE PARAMÈTRE ====== */
+.settings-icon {
+    font-size: 31px;
+    color: #444;
+}
+
+
+
+
+
+
+
+
+.dropdown-menu {
+  position: absolute;
+  right: 0;
+  top: 22px;
+  background: #fff;
+  border-radius: 6px;
+  box-shadow: 0 2px 6px rgba(0,0,0,.2);
+  z-index: 50;
+}
+
+.dropdown-menu button {
+  padding: 8px 12px;
+  border: none;
+  background: none;
+  width: 100%;
+  cursor: pointer;
+}
+
+.dropdown-menu button:hover {
+  background: #f2f2f2;
+}
+
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,.45);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 999;
+}
+
+.modal-box {
+  background: white;
+  width: 420px;
+  border-radius: 10px;
+  padding: 15px;
+}

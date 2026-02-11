@@ -1,0 +1,38 @@
+{
+  "Developpeur Python": {
+    "competences": ["Python", "SQL", "FastAPI", "Docker", "Git"],
+    "experience_min": 3,
+    "diplome_requis": "Master Informatique",
+    "poids": {"competences": 0.4, "experience": 0.3, "formation": 0.2, "projets": 0.1}
+  },
+  "Data Scientist": {
+    "competences": ["Python", "Pandas", "Machine Learning", "SQL", "Visualization"],
+    "experience_min": 2,
+    "diplome_requis": "Master Data Science",
+    "poids": {"competences": 0.5, "experience": 0.2, "formation": 0.2, "projets": 0.1}
+  },
+  "Administrateur Système": {
+    "competences": ["Linux", "Windows Server", "Networking", "Docker", "Cloud"],
+    "experience_min": 3,
+    "diplome_requis": "Licence Informatique",
+    "poids": {"competences": 0.4, "experience": 0.3, "formation": 0.2, "projets": 0.1}
+  },
+  "Chef de Projet IT": {
+    "competences": ["Gestion de projet", "Agile", "Communication", "Budgeting", "Planning"],
+    "experience_min": 5,
+    "diplome_requis": "Master Gestion de Projet",
+    "poids": {"competences": 0.35, "experience": 0.35, "formation": 0.2, "projets": 0.1}
+  },
+  "Consultant RH": {
+    "competences": ["Recrutement", "Paie", "Formation", "Droit du travail", "Communication"],
+    "experience_min": 3,
+    "diplome_requis": "Master RH",
+    "poids": {"competences": 0.4, "experience": 0.3, "formation": 0.2, "projets": 0.1}
+  },
+  "Analyste Financier": {
+    "competences": ["Excel", "Finance", "Reporting", "SQL", "PowerBI"],
+    "experience_min": 3,
+    "diplome_requis": "Master Finance",
+    "poids": {"competences": 0.4, "experience": 0.3, "formation": 0.2, "projets": 0.1}
+  }
+}

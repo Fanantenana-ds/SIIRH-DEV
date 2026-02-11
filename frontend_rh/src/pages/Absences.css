@@ -1,0 +1,244 @@
+.temps-absences-page {
+  padding: 20px;
+  font-family: Arial, sans-serif;
+  background: #f9f9f9;
+  min-height: 100vh;
+}
+
+/* === Header === */
+.header {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.header h2 {
+  margin: 0;
+  color: #333;
+}
+
+/* === Tabs === */
+.tabs {
+  display: flex;
+  gap: 10px;
+}
+
+.tabs button {
+  padding: 8px 16px;
+  border: none;
+  background: #007bff;
+  color: #fff;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: background 0.2s;
+}
+
+.tabs button:hover {
+  background: #0056b3;
+}
+
+/* === Forms === */
+.tab-content form {
+  background: #fff;
+  padding: 15px;
+  margin: 15px 0;
+  border-radius: 6px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.tab-content form label {
+  display: flex;
+  flex-direction: column;
+  font-weight: bold;
+  font-size: 14px;
+}
+
+.tab-content form input,
+.tab-content form select {
+  padding: 6px 8px;
+  font-size: 14px;
+  margin-top: 4px;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+}
+
+/* === Form Buttons === */
+.form-buttons {
+  display: flex;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.form-buttons button {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.cancel-btn {
+  background: #dc3545;
+  color: #fff;
+}
+
+.cancel-btn:hover {
+  background: #c82333;
+}
+
+.form-buttons button[type="submit"] {
+  background: #28a745;
+  color: #fff;
+}
+
+.form-buttons button[type="submit"]:hover {
+  background: #218838;
+}
+
+/* === Tableaux === */
+.tab-content table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 10px;
+  background: #fff;
+  border-radius: 6px;
+  overflow-x: auto;
+}
+
+.tab-content table th,
+.tab-content table td {
+  padding: 10px;
+  text-align: left;
+  font-size: 14px;
+  border-bottom: 1px solid #eee;
+  white-space: nowrap;
+}
+
+.tab-content table th {
+  background-color: #1e7e34; /* vert foncé entête */
+  color: #fff;
+}
+
+.tab-content table tr:hover {
+  background: #f1f1f1;
+}
+
+/* === Boutons Actions dans le tableau === */
+.tab-content table td button {
+  margin-right: 5px;
+  padding: 4px 8px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.95rem;
+  transition: transform 0.2s, background-color 0.2s;
+}
+
+.tab-content table td button:first-child {
+  background: #ffc107; /* éditer */
+  color: #fff;
+}
+
+.tab-content table td button:first-child:hover {
+  transform: scale(1.1);
+}
+
+.tab-content table td button:nth-child(2) {
+  background: #dc3545; /* supprimer */
+  color: #fff;
+}
+
+.tab-content table td button:nth-child(2):hover {
+  transform: scale(1.1);
+}
+
+.tab-content table td button:last-child {
+  background-color: #28a745; /* détails popup */
+  color: #fff;
+}
+
+.tab-content table td button:last-child:hover {
+  transform: scale(1.1);
+  background-color: #218838;
+}
+
+/* === Export Button === */
+.tab-content h3 {
+  margin-top: 20px;
+  margin-bottom: 10px;
+}
+
+.tab-content button {
+  padding: 8px 16px;
+  border: none;
+  background: #17a2b8;
+  color: #fff;
+  border-radius: 4px;
+  cursor: pointer;
+  margin-bottom: 10px;
+}
+
+.tab-content button:hover {
+  background: #117a8b;
+}
+
+/* === Popup détails === */
+.popup-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.popup-content {
+  background: #fff;
+  padding: 20px;
+  border-radius: 6px;
+  width: 90%;
+  max-width: 500px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+}
+
+.popup-content h3 {
+  margin-top: 0;
+  color: #1e7e34; /* vert foncé */
+}
+
+.popup-content button {
+  margin-top: 15px;
+  padding: 6px 12px;
+  background: #28a745;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.popup-content button:hover {
+  background: #218838;
+}
+
+/* === Responsive === */
+@media (max-width: 768px) {
+  .tabs {
+    flex-direction: column;
+  }
+
+  .form-buttons {
+    flex-direction: column;
+  }
+
+  .tab-content table th,
+  .tab-content table td {
+    font-size: 12px;
+    padding: 6px;
+  }
+}

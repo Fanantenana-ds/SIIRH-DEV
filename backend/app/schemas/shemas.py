@@ -1,0 +1,65 @@
+from datetime import date
+from pydantic import BaseModel
+from typing import Optional
+
+# =====================
+# 🔹 Schema base
+# =====================
+class AbsenceBase(BaseModel):
+    employee_id: int
+    type_absence: str       
+    date_debut: date
+    date_fin: date
+    motif: Optional[str] = ""
+    statut: Optional[str] = "en attente"
+
+# =====================
+# 🔹 Schema pour création
+# =====================
+class AbsenceCreate(AbsenceBase):
+    pass
+
+# =====================
+# 🔹 Schema pour update
+# =====================
+class AbsenceUpdate(BaseModel):
+    employee_id: Optional[int] = None
+    type_absence: Optional[str] = None
+    date_debut: Optional[date] = None
+    date_fin: Optional[date] = None
+    motif: Optional[str] = None
+    statut: Optional[str] = None
+
+# =====================
+# 🔹 Schema pour lecture / GET
+# =====================
+class AbsenceRead(AbsenceBase):
+    id: int
+
+    class Config:
+        from_attributes = True  
+# =====================
+# 🔹 Schema base Conge
+# =====================
+class CongeBase(BaseModel):
+    employee_id: int
+    date_debut: date
+    date_fin: date
+    motif: Optional[str] = ""
+    statut: Optional[str] = "en attente"
+
+# =====================
+# 🔹 Schema pour création Conge
+# =====================
+class CongeCreate(CongeBase):
+    pass
+
+# =====================
+# 🔹 Schema pour update Conge
+# =====================
+class CongeUpdate(BaseModel):
+    employee_id: Optional[int] = None
+    date_debut: Optional[date] = None
+    date_fin: Optional[date] = None
+    motif: Optional[str] = None
+    statut: Optional[str] = None

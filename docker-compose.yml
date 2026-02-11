@@ -1,0 +1,50 @@
+version: "3.9"
+
+services:
+  db:
+    image: postgres:15
+    container_name: siirh_db
+    restart: always
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin
+      POSTGRES_DB: siirh_db
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.prod
+    container_name: siirh_backend_prod
+    depends_on:
+      - db
+    environment:
+      DATABASE_URL: postgresql://admin:admin@db:5432/siirh_db
+    ports:
+      - "8000:8000"
+
+  frontend_rh:
+    build:
+      context: ./frontend_rh
+      dockerfile: Dockerfile.prod
+    container_name: siirh_frontend_rh_prod
+    depends_on:
+      - backend
+    ports:
+      - "8080:80"
+
+  frontend_candidat:
+    build:
+      context: ./frontend_candidat
+      dockerfile: Dockerfile.prod
+    container_name: siirh_frontend_candidat_prod
+    depends_on:
+      - backend
+    ports:
+      - "8081:80"
+
+volumes:
+  db_data:

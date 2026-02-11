@@ -1,0 +1,21 @@
+# Python
+*.pyc
+__pycache__/
+venv/
+.env
+
+# Node
+node_modules/
+package-lock.json
+
+# IDE
+.vscode/
+.idea/
+venv/
+node_modules/
+__pycache__/
+.env
+*.pyc
+backend/minio
+backend/minio
+backend/minio

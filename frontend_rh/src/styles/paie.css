@@ -1,0 +1,254 @@
+/* ===============================
+   ---- CONTAINER ----
+================================ */
+.paie-container {
+  padding: 20px;
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+/* ===============================
+   ---- TITLES ----
+================================ */
+.paie-title {
+  font-size: 28px;
+  font-weight: bold;
+  margin-bottom: 20px;
+  color: #1f8f4c; /* maitso pro */
+}
+
+.paie-section-title {
+  font-size: 20px;
+  font-weight: bold;
+  margin-bottom: 15px;
+  color: #1f8f4c;
+}
+
+/* ===============================
+   ---- CARDS ----
+================================ */
+.paie-card {
+  background: #ffffff;
+  padding: 20px;
+  border-radius: 12px;
+  margin-bottom: 25px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+}
+
+/* ===============================
+   ---- FORM ----
+================================ */
+.paie-form {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 15px;
+}
+
+.paie-form label {
+  font-weight: 600;
+  margin-bottom: 5px;
+  display: block;
+}
+
+.paie-form input,
+.paie-form select {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #bbb;
+  border-radius: 6px;
+  font-size: 14px;
+  box-sizing: border-box;
+  margin-bottom: 12px;
+}
+
+.paie-form input:focus,
+.paie-form select:focus {
+  outline: none;
+  border-color: #1f8f4c;
+  box-shadow: 0 0 5px rgba(31,143,76,0.35);
+}
+
+/* ===============================
+   ---- BUTTONS ----
+================================ */
+.btn-ajout,
+.btn-enregistrer {
+  background: #1f8f4c;
+  color: #fff;
+  border: none;
+  padding: 10px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.btn-ajout:hover,
+.btn-enregistrer:hover {
+  background: #18723d;
+}
+
+.btn-annuler {
+  background: #d9534f;
+  color: white;
+  border: none;
+  padding: 10px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.btn-annuler:hover {
+  background: #c9302c;
+}
+
+/* ===============================
+   ---- TABLE PRO ----
+================================ */
+.paie-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 15px;
+  background: #ffffff;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 3px 10px rgba(0,0,0,0.06);
+}
+
+/* ---- HEADER ---- */
+.paie-table thead {
+  background-color: #1f8f4c;
+}
+
+.paie-table thead th {
+  padding: 14px;
+  color: #ffffff;
+  font-weight: 600;
+  text-align: center;
+  text-transform: uppercase;
+  font-size: 13px;
+  letter-spacing: 0.4px;
+}
+
+/* ---- BODY ---- */
+.paie-table tbody td {
+  padding: 12px;
+  text-align: center;
+  border-bottom: 1px solid #eee;
+  color: #333;
+  font-size: 14px;
+}
+
+/* ---- HOVER EFFECT ---- */
+.paie-table tbody tr {
+  transition: background-color 0.25s ease, transform 0.15s ease;
+}
+
+.paie-table tbody tr:hover {
+  background-color: #e9f7ef;
+  cursor: pointer;
+}
+
+/* ===============================
+   ---- DELETE BUTTON ----
+================================ */
+.paie-delete-btn {
+  background: #d9534f;
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.paie-delete-btn:hover {
+  background: #c9302c;
+}
+
+/* ===============================
+   ---- MODAL ----
+================================ */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.45);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  background: #ffffff;
+  padding: 22px 25px;
+  border-radius: 12px;
+  width: 90%;
+  max-width: 450px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+}
+
+.modal-content h2.paie-section-title {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+/* ===============================
+   ---- SEARCH DROPDOWN ----
+================================ */
+.paie-form div[style*="position: relative"] ul {
+  border: 1px solid #bbb;
+  border-radius: 6px;
+  background-color: #fff;
+  max-height: 150px;
+  overflow-y: auto;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+}
+
+.paie-form div[style*="position: relative"] ul li {
+  padding: 8px 10px;
+  cursor: pointer;
+}
+
+.paie-form div[style*="position: relative"] ul li:hover {
+  background-color: #1f8f4c;
+  color: #fff;
+}
+
+/* ===============================
+   ---- RESPONSIVE ----
+================================ */
+@media (max-width: 768px) {
+  .paie-form {
+    grid-template-columns: 1fr;
+  }
+}
+
+
+/* ===== FORCE TABLE HEADER GREEN ===== */
+.paie-table thead,
+.paie-table thead tr,
+.paie-table thead th {
+  background-color: #1f8f4c !important;
+  color: #ffffff !important;
+}
+
+/* Remove old gray */
+.paie-table th {
+  background: #1f8f4c !important;
+}
+
+/* ===== FIX EMPLOYE DROPDOWN INVISIBLE ===== */
+.paie-form div[style*="position: relative"] {
+  position: relative;
+  z-index: 9999;
+}
+
+.paie-form div[style*="position: relative"] ul {
+  position: absolute !important;
+  top: 100%;
+  left: 0;
+  width: 100%;
+  z-index: 99999 !important;
+  background-color: #ffffff;
+}

@@ -1,0 +1,178 @@
+.dashboard-container {
+  padding: 10px 20px 20px 20px;
+  font-family: 'Arial', sans-serif;
+}
+
+.dashboard-header {
+  text-align: center;
+  margin-top: 0;
+  margin-bottom: 25px;
+}
+
+.dashboard-title {
+  background-color: #28a745;
+  color: white;
+  display: inline-block;
+  padding: 18px 35px;
+  border-radius: 10px;
+  font-size: 32px;
+  font-weight: bold;
+  margin-bottom: 15px;
+}
+
+/* === BARRE DE RECHERCHE === */
+.dashboard-search {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 10px;
+  position: relative;
+}
+
+.dashboard-search input {
+  width: 60%;
+  padding: 12px 15px 12px 45px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  font-size: 16px;
+  outline: none;
+  text-align: center;
+}
+
+.dashboard-search-icon {
+  position: absolute;
+  left: calc(20% + 12px);
+  color: #555;
+  pointer-events: none;
+  background: white;
+  border-radius: 50%;
+  padding: 5px;
+  font-size: 18px;
+}
+
+/* === BOUTONS DU DASHBOARD === */
+.dashboard-buttons {
+  margin-top: 30px;
+}
+
+.dashboard-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background-color: #f1f5f9;
+  padding: 20px;
+  border-radius: 12px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+
+.dashboard-btn:hover {
+  transform: translateY(-5px);
+  background-color: #e2e8f0;
+}
+
+.icon-wrapper {
+  margin-bottom: 10px;
+}
+
+.dashboard-label {
+  font-size: 16px;
+  margin-bottom: 5px;
+}
+
+.dashboard-stat {
+  font-size: 24px;
+  font-weight: bold;
+  color: #1E90FF;
+}
+
+/* === TABLEAU DES CANDIDATURES === */
+.liste-entretien-container {
+  overflow-x: auto;
+}
+
+.entretien-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: white;
+}
+
+.entretien-table th,
+.entretien-table td {
+  border: 1px solid #ddd;
+  padding: 10px;
+  text-align: center;
+}
+
+.entretien-table th {
+  background-color: #53e074;
+  font-weight: bold;
+  text-transform: uppercase;
+  color: white;
+}
+
+.entretien-table tr:nth-child(even) {
+  background-color: #f9f9f9;
+}
+
+/* === COULEURS STATUT === */
+.decision.go {
+  color: #28a745;
+  font-weight: bold;
+}
+
+.decision.nogo {
+  color: #dc3545;
+  font-weight: bold;
+}
+
+.decision.hold {
+  color: #ffc107;
+  font-weight: bold;
+}
+
+/* === BOUTONS D’ACTION === */
+.selection-btn {
+  background-color: #168be5;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 6px 12px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.selection-btn:hover {
+  background-color: #218838;
+}
+
+.refuse-btn {
+  background-color: #dc3545;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 6px 12px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.refuse-btn:hover {
+  background-color: #c82333;
+}
+
+/* Convocation: bouton bleu */
+.envoyer-btn {
+  background-color: #1E90FF;
+  color: rgb(180, 47, 47);
+  border: none;
+  border-radius: 6px;
+  padding: 6px 12px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.envoyer-btn:hover {
+  background-color: #0066cc;
+}

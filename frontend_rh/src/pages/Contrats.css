@@ -1,0 +1,270 @@
+/* Contrats.css */
+
+/* Wrapper général */
+.contrats-wrapper {
+  padding: 20px;
+  background-color: #f8f9fa;
+  min-height: 100vh;
+  font-family: "Inter", sans-serif;
+  overflow: visible;
+  padding-bottom: 120px; /* mamela espace malalaka ambany */
+}
+
+/* ----- Header ----- */
+.contrats-header {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  margin-bottom: 20px;
+}
+
+.contrats-title-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.contrats-title-icon {
+  color: #4f46e5;
+  width: 28px;
+  height: 28px;
+}
+
+.contrats-title {
+  font-size: 28px;
+  font-weight: 700;
+  color: #1e3a8a;
+}
+
+/* Search + bouton création */
+.contrats-controls {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+  margin-bottom: 20px;
+}
+
+.search-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  margin-top: 10px;
+  margin-bottom: 10px;
+  width: 100%;
+  max-width: 300px;
+}
+
+.search-wrapper input {
+  width: 100%;
+  padding: 8px 12px 8px 36px;
+  border-radius: 8px;
+  border: 1px solid #d1d5db;
+  font-size: 14px;
+  transition: border 0.3s, box-shadow 0.3s;
+}
+
+.search-wrapper input:focus {
+  outline: none;
+  border-color: #4f46e5;
+  box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.2);
+}
+
+.search-wrapper .search-icon {
+  position: absolute;
+  left: 10px;
+  color: #9ca3af;
+  width: 16px;
+  height: 16px;
+}
+
+.btn-add {
+  padding: 8px 16px;
+  background-color: #4f46e5;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.3s, transform 0.2s;
+}
+
+.btn-add:hover {
+  background-color: #4338ca;
+  transform: translateY(-1px);
+}
+
+/* ----- Tableau ----- */
+.contrats-table-container {
+  overflow-x: auto;
+  overflow-y: visible; /* azo jerena ny dropdown mivoaka ambany */
+  position: relative;   /* zava-dehibe */
+  padding-bottom: 100px; /* mamela espace ambany */
+}
+
+
+.contrats-table {
+  width: 100%;
+  border-collapse: collapse;
+  background-color: #fff;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+}
+
+.contrats-table th, .contrats-table td {
+  padding: 12px 15px;
+  text-align: left;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.contrats-table th {
+  background-color: #f3f4f6;
+  color: #111827;
+  font-weight: 600;
+}
+
+.contrats-table tbody tr:hover {
+  background-color: #f9fafb;
+}
+
+/* ----- Formulaire overlay ----- */
+.contrat-form-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;      /* width avy amin’ny écran manontolo */
+  height: 100vh;     /* height avy amin’ny écran manontolo */
+  background-color: rgba(0,0,0,0.5);
+  display: flex;
+  justify-content: center; /* centrer horizontalement */
+  align-items: center;     /* centrer verticalement */
+  z-index: 1000;
+}
+
+
+/* ----- Formulaire ----- */
+.contrat-form {
+  background-color: #fff;
+  padding: 30px 35px;
+  border-radius: 12px;
+  width: 600px;      /* width vaovao azo ovaina araka izay tiana */
+  max-width: 95%;
+  box-shadow: 0 6px 25px rgba(0,0,0,0.2);
+  max-height: 90vh;  /* misoroka overflow be */
+  overflow-y: auto;  /* scroll anatiny raha lava */
+  display: flex;
+  flex-direction: column;
+}
+
+/* ----- Titre ----- */
+.contrat-form h2 {
+  margin-bottom: 20px;
+  font-size: 22px;
+  color: #1f2937;
+  text-align: center; /* afovoany */
+}
+
+/* ----- Champs formulaire ----- */
+.contrat-form label {
+  display: block;
+  margin-bottom: 6px;
+  font-weight: 500;
+  color: #374151;
+}
+
+.contrat-form input[type="text"],
+.contrat-form input[type="date"],
+.contrat-form input[type="number"],
+.contrat-form select,
+.contrat-form textarea {
+  width: 100%;
+  padding: 8px 12px;
+  margin-bottom: 15px;
+  border-radius: 8px;
+  border: 1px solid #d1d5db;
+  font-size: 14px;
+  transition: border 0.3s, box-shadow 0.3s;
+}
+
+/* Textarea mitovy halava amin'ny champ hafa */
+.contrat-form textarea {
+  min-height: 38px; 
+  padding: 8px 1px; 
+  font-size: 14px;
+  line-height: 20px;
+  resize: vertical;
+}
+
+.contrat-form input:focus,
+.contrat-form select:focus,
+.contrat-form textarea:focus {
+  outline: none;
+  border-color: #4f46e5;
+  box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.2);
+}
+
+/* Autocomplete employé */
+.autocomplete-list {
+  background-color: #fff;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  max-height: 150px;
+  overflow-y: auto;
+  margin-top: -10px;
+  margin-bottom: 10px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+  z-index: 1001;
+  position: relative;
+}
+
+.autocomplete-item {
+  padding: 8px 12px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.autocomplete-item:hover {
+  background-color: #f3f4f6;
+}
+
+/* Actions formulaire (bokotra) */
+.form-actions {
+  display: flex;
+  justify-content: flex-start; /* afaka center raha tiana */
+  gap: 12px;
+  margin-top: auto; /* manery azy eo ambany scrollbar rehefa scrollable */
+}
+
+/* ----- Export dropdown ----- */
+.export-dropdown {
+  background: white;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  margin-top: 4px;
+  z-index: 3000; 
+  min-width: 80px;
+  position: fixed;
+}
+
+.export-dropdown div {
+  padding: 6px 12px;
+  cursor: pointer;
+}
+
+.export-dropdown div:hover {
+  background-color: #f0f0f0;
+}
+
+.export-container {
+  position: relative;
+  display: inline-block;
+}
+
+.btn-export {
+  background-color: #007bff;
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+}

@@ -1,0 +1,222 @@
+/* OffresForm.css */
+
+/* Conteneur global */
+.offre-form-container {
+  max-width: 1000px;
+  margin: auto;
+  font-family: 'Inter', sans-serif;
+  padding: 2rem;
+  background-color: #f9fafb;
+}
+
+/* Titre principal */
+.offre-form-container h2 {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #065f46;
+  /* vert SIIRH */
+  margin-bottom: 2rem;
+  text-align: center;
+}
+
+/* Sous-titres de section */
+.offre-form-container h3 {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: #047857;
+  /* vert foncé */
+  margin-top: 2rem;
+  margin-bottom: 1rem;
+  border-bottom: 2px solid #d1fae5;
+  padding-bottom: 0.2rem;
+}
+
+/* Wrapper champ + label */
+.form-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  /* elanelana eo label sy input */
+  margin-bottom: 1rem;
+  /* elanelana eo champs tsirairay */
+  width: 100%;
+}
+
+/* Champs input / textarea / select */
+.offre-form-container input,
+.offre-form-container select,
+.offre-form-container textarea {
+  width: 100%;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid #d1d5db;
+  border-radius: 0.75rem;
+  font-size: 0.95rem;
+  background-color: #f9fafb;
+  transition: all 0.2s;
+  box-sizing: border-box;
+  /* hahazo width uniforme */
+}
+
+/* Focus */
+.offre-form-container input:focus,
+.offre-form-container textarea:focus,
+.offre-form-container select:focus {
+  outline: none;
+  border-color: #10b981;
+  /* vert focus */
+  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.2);
+  background-color: #ffffff;
+}
+
+/* Textarea */
+.offre-form-container textarea {
+  min-height: 80px;
+  resize: vertical;
+}
+
+/* Date input: mitovy width amin'ny champs rehetra + elanelana ambony */
+input[type="date"] {
+  margin-top: 0.5rem;
+}
+
+select[name="contract_type"] {
+  margin-bottom: 0.5rem;
+}
+
+/* Boutons */
+.offre-form-container button {
+  padding: 0.6rem 1.2rem;
+  border-radius: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+button:hover {
+  transform: translateY(-2px);
+}
+
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: #10b981;
+  cursor: pointer;
+  box-shadow: 0 0 2px rgba(0, 0, 0, 0.3);
+  transition: all 0.2s;
+}
+
+input[type="range"]::-webkit-slider-thumb:hover {
+  background: #059669;
+  transform: scale(1.1);
+}
+
+input[type="range"]::-moz-range-thumb {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: #10b981;
+  cursor: pointer;
+  box-shadow: 0 0 2px rgba(0, 0, 0, 0.3);
+  transition: all 0.2s;
+}
+
+/* Label sliders */
+.slider-label {
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: #065f46;
+  margin-bottom: 0.25rem;
+  display: flex;
+  justify-content: space-between;
+}
+
+/* Container sliders scoring automatique */
+.scoring-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  background-color: #ecfdf5;
+  padding: 1rem;
+  border-radius: 1rem;
+  border: 1px solid #10b981;
+}
+
+/* Textarea résultat généré */
+.offre-form-container textarea[readonly] {
+  background-color: #f3f4f6;
+  color: #111827;
+  font-family: 'Courier New', monospace;
+  min-height: 200px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .offre-form-container form {
+    grid-template-columns: 1fr !important;
+  }
+
+  .scoring-container {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+/* Uniformiser largeur label+input */
+.scoring-container .form-field,
+.offre-form-container .form-field {
+  width: 100%;
+}
+
+/* Container formulaire */
+.offre-form-container {
+  font-family: Arial, sans-serif;
+}
+
+/* Bouton Annuler */
+button.ml-auto.bg-red-600 {
+  background-color: #dc2626;
+  color: #fff;
+  transition: background-color 0.3s;
+}
+
+button.ml-auto.bg-red-600:hover {
+  background-color: #b91c1c;
+}
+
+/* Input Filtrer par poste */
+input[placeholder="Filtrer par poste"] {
+  margin-top: 8px;
+  text-align: center;
+  padding: 8px 12px;
+  border: 1px solid #d1d5db;
+  border-radius: 0.75rem;
+  width: 100%;
+  max-width: 300px;
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+input[placeholder="Filtrer par poste"]::placeholder {
+  text-align: center;
+  color: #6b7280;
+}
+
+table {
+  margin-top: 12px;
+  border-collapse: separate;
+  border-spacing: 0 6px;
+}
+
+table thead tr {
+  border-radius: 0.5rem;
+}
+
+table th,
+table td {
+  padding: 8px 12px;
+  text-align: left;
+}
